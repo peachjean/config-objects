@@ -34,5 +34,23 @@ public class ItscoFactorySupportTest {
         assertEquals(88, exampleItsco.getIntValue().intValue());
     }
 
+    @Test
+    public void dynamicBackerExample()
+    {
+        Properties props = new Properties();
+        props.setProperty("value1", "I am zee value!");
+        props.setProperty("intValue", "88");
 
+        PropertiesItscoFactory factory = new PropertiesItscoFactory();
+
+        ExampleItsco exampleItsco = factory.create(props, ExampleItsco.class);
+
+        assertEquals("I am zee value!", exampleItsco.getValue1());
+        assertEquals("secondValue", exampleItsco.getValue2());
+        assertEquals(88, exampleItsco.getIntValue().intValue());
+
+        props.setProperty("intValue", "42");
+
+        assertEquals(42, exampleItsco.getIntValue().intValue());
+    }
 }
