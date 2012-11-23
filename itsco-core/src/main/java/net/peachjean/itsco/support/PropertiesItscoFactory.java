@@ -2,10 +2,9 @@ package net.peachjean.itsco.support;
 
 import java.util.Properties;
 
-public class PropertiesItscoFactory<T> extends ItscoFactorySupport<T, Properties> {
+public class PropertiesItscoFactory extends ItscoFactorySupport<Properties> {
 
-    public PropertiesItscoFactory(final Class<T> itscoClass) {
-        super(itscoClass);
+    public PropertiesItscoFactory() {
     }
 
     @Override

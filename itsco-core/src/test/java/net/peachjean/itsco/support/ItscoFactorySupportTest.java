@@ -16,9 +16,9 @@ public class ItscoFactorySupportTest {
         props.setProperty("value1", "I am zee value!");
         props.setProperty("intValue", "88");
 
-        PropertiesItscoFactory<ExampleItsco> factory = new PropertiesItscoFactory<ExampleItsco>(ExampleItsco.class);
+        PropertiesItscoFactory factory = new PropertiesItscoFactory();
 
-        ExampleItsco exampleItsco = factory.create(props);
+        ExampleItsco exampleItsco = factory.create(props, ExampleItsco.class);
 
         assertEquals("I am zee value!", exampleItsco.getValue1());
         assertEquals("secondValue", exampleItsco.getValue2());
