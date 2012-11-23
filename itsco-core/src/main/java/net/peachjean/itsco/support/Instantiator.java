@@ -6,6 +6,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import javassist.*;
 import javassist.bytecode.AccessFlag;
+import org.apache.commons.lang.RandomStringUtils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -56,7 +57,7 @@ class Instantiator {
             ClassPool pool = ClassPool.getDefault();
 
             // setup class
-            CtClass implCC = pool.makeClass(itscoClass.getCanonicalName() + "$$ItscoImpl");
+            CtClass implCC = pool.makeClass(itscoClass.getCanonicalName() + "$$ItscoImpl$$" + RandomStringUtils.randomAlphanumeric(7));
             final CtClass defaultsClass = getDefaultsClass(itscoClass, pool);
             implCC.setSuperclass(defaultsClass);
             final CtClass itscoInterface = pool.getCtClass(itscoClass.getName());

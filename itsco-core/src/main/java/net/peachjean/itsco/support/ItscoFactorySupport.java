@@ -1,21 +1,20 @@
 package net.peachjean.itsco.support;
 
 import com.google.common.base.Function;
-import com.google.common.cache.LoadingCache;
-import javassist.*;
-import javassist.bytecode.AccessFlag;
-
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import net.peachjean.itsco.Itsco;
 
 /**
  *
  */
-public abstract class ItscoFactorySupport<C> {
+public abstract class ItscoFactorySupport<C> implements ContextAccessor<C> {
 
     private final Instantiator instantiator = new Instantiator();
+    private final FieldResolutionStrategy[] strategies = {
+            StringResolutionStrategy.INSTANCE,
+            ValueOfResolutionStrategy.INSTANCE,
+            new ItscoResolutionStrategy()
+    };
+
 
     protected ItscoFactorySupport() {
     }
@@ -39,48 +38,50 @@ public abstract class ItscoFactorySupport<C> {
     private ItscoBacker createBacker(final C context) {
         return new ItscoBacker() {
             public <T> T lookup(final String name, final Class<T> lookupType) {
-                if(contains(context, name))
-                {
-                    return getAndReturn(name, lookupType);
-                }
-                else
+                FieldResolutionStrategy resolutionStrategy = determineStrategy(lookupType);
+                final T resolved = resolutionStrategy.resolve(name, lookupType, context, ItscoFactorySupport.this);
+                if(resolved == null)
                 {
                     throw new IllegalStateException("No value for " + name);
                 }
+                return resolved;
             }
 
             public <T> T lookup(final String name, final Class<T> lookupType, final T defaultValue) {
-                if(contains(context, name))
-                {
-                    return getAndReturn(name, lookupType);
-                }
-                else
-                {
-                    return defaultValue;
-                }
+                FieldResolutionStrategy resolutionStrategy = determineStrategy(lookupType);
+                final T resolved = resolutionStrategy.resolve(name, lookupType, context, ItscoFactorySupport.this);
+                return resolved != null ? resolved : defaultValue;
             }
 
-            private <T> T getAndReturn(final String name, final Class<T> lookupType) {
-                String value = contextLookup(context, name);
-                if(String.class == lookupType)
+            private <T> FieldResolutionStrategy determineStrategy(final Class<T> lookupType) {
+                for(FieldResolutionStrategy strategy: strategies)
                 {
-                    return (T) value;
+                    if(strategy.supports(lookupType))
+                    {
+                        return strategy;
+                    }
                 }
-                try {
-                    Method m = lookupType.getMethod("valueOf", String.class);
-                    return lookupType.cast(m.invoke(null, value));
-                } catch (NoSuchMethodException e) {
-                    throw new IllegalStateException("Could not find a valueOf method on " + lookupType);
-                } catch (InvocationTargetException e) {
-                    throw new IllegalStateException("Could not invoke valueOf method on " + lookupType);
-                } catch (IllegalAccessException e) {
-                    throw new IllegalStateException("Could not invoke valueOf method on " + lookupType);
-                }
+                throw new IllegalStateException("No strategy to support type " + lookupType.getName());
             }
         };
     }
 
-    protected abstract boolean contains(C context, String key);
+    private class ItscoResolutionStrategy implements FieldResolutionStrategy {
+        @Override
+        public <T, CN> T resolve(final String name, final Class<T> lookupType, final CN context, final ContextAccessor<CN> contextAccessor) {
+            if(!this.supports(lookupType))
+            {
+                throw new IllegalArgumentException("This strategy only supports itsco types, not " + lookupType.getName());
+            }
 
-    protected abstract String contextLookup(C context, String key);
+            @SuppressWarnings("unchecked")
+            C subContext = (C) contextAccessor.subContextLookup(context, name);
+            return ItscoFactorySupport.this.create(subContext, lookupType);
+        }
+
+        @Override
+        public boolean supports(final Class<?> lookupType) {
+            return lookupType.isAnnotationPresent(Itsco.class);
+        }
+    }
 }
