@@ -9,4 +9,6 @@ public interface FieldResolutionStrategy {
     <T,C> T resolve(String name, Class<T> lookupType, C context, ContextAccessor<C> contextAccessor);
 
     boolean supports(Class<?> lookupType);
+
+    boolean handlesReloading();
 }

@@ -24,4 +24,9 @@ public class StringResolutionStrategy implements FieldResolutionStrategy {
     public boolean supports(final Class<?> lookupType) {
         return String.class.equals(lookupType);
     }
+
+    @Override
+    public boolean handlesReloading() {
+        return false;
+    }
 }

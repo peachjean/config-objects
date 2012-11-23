@@ -1,7 +1,10 @@
 package net.peachjean.itsco.support;
 
 import com.google.common.base.Function;
+import com.google.common.collect.Maps;
 import net.peachjean.itsco.Itsco;
+
+import java.util.Map;
 
 /**
  *
@@ -37,12 +40,28 @@ public abstract class ItscoFactorySupport<C> implements ContextAccessor<C> {
 
     private ItscoBacker createBacker(final C context) {
         return new ItscoBacker() {
+
+            // contains values that handle reloading on their own - these are often more expensive to create so we
+            // don't want to recreate them on every get call
+            private final Map<String, Object> cachedValues = Maps.newHashMap();
+
             public <T> T lookup(final String name, final Class<T> lookupType) {
                 FieldResolutionStrategy resolutionStrategy = determineStrategy(lookupType);
+                if(resolutionStrategy.handlesReloading())
+                {
+                    if(cachedValues.containsKey(name))
+                    {
+                        return lookupType.cast(cachedValues.get(name));
+                    }
+                }
                 final T resolved = resolutionStrategy.resolve(name, lookupType, context, ItscoFactorySupport.this);
                 if(resolved == null)
                 {
                     throw new IllegalStateException("No value for " + name);
+                }
+                if(resolutionStrategy.handlesReloading())
+                {
+                    cachedValues.put(name, resolved);
                 }
                 return resolved;
             }
@@ -82,6 +101,11 @@ public abstract class ItscoFactorySupport<C> implements ContextAccessor<C> {
         @Override
         public boolean supports(final Class<?> lookupType) {
             return lookupType.isAnnotationPresent(Itsco.class);
+        }
+
+        @Override
+        public boolean handlesReloading() {
+            return true;
         }
     }
 }

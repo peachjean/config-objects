@@ -55,4 +55,9 @@ public class ValueOfResolutionStrategy implements FieldResolutionStrategy {
     public boolean supports(final Class<?> lookupType) {
         return lookupMethod(lookupType) != null;
     }
+
+    @Override
+    public boolean handlesReloading() {
+        return false;
+    }
 }
