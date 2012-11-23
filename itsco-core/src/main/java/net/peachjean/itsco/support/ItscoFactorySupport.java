@@ -1,5 +1,6 @@
 package net.peachjean.itsco.support;
 
+import com.google.common.base.Function;
 import com.google.common.cache.LoadingCache;
 import javassist.*;
 import javassist.bytecode.AccessFlag;
@@ -20,7 +21,19 @@ public abstract class ItscoFactorySupport<C> {
     }
 
     public <T> T create(C context, Class<T> itscoClass) {
-        return instantiator.instantiateItsco(itscoClass, createBacker(context));
+        return instantiator.lookupFunction(itscoClass).apply(createBacker(context));
+    }
+
+    public <T> Function<C, T> createGenerator(final Class<T> itscoClass)
+    {
+        return new Function<C, T>() {
+            final Function<ItscoBacker, T> implFunction = instantiator.lookupFunction(itscoClass);
+
+            @Override
+            public T apply(final C context) {
+                return implFunction.apply(createBacker(context));
+            }
+        };
     }
 
     private ItscoBacker createBacker(final C context) {

@@ -15,20 +15,13 @@ class Instantiator {
 
     private final LoadingCache<Class, Function<ItscoBacker, Object>> cache = CacheBuilder.newBuilder().build(new ImplementationGenerator());
 
-    <T> T instantiateItsco(Class<T> itscoInterface, ItscoBacker backer)
-    {
+    @SuppressWarnings("unchecked")
+    <T> Function<ItscoBacker, T> lookupFunction(final Class<T> itscoInterface) {
         try {
-            Function<ItscoBacker, T> creationFunction = lookupFunction(itscoInterface);
-            return creationFunction.apply(backer);
+            return (Function<ItscoBacker, T>) cache.get(itscoInterface);
         } catch (ExecutionException e) {
             throw new RuntimeException("Failed to instantiate itsco " + itscoInterface.getName(), e);
         }
-    }
-
-
-    @SuppressWarnings("unchecked")
-    private <T> Function<ItscoBacker, T> lookupFunction(final Class<T> itscoInterface) throws ExecutionException {
-        return (Function<ItscoBacker, T>) cache.get(itscoInterface);
     }
 
     private class ImplementationGenerator extends CacheLoader<Class,Function<ItscoBacker, Object>> {

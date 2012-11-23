@@ -1,5 +1,6 @@
 package net.peachjean.itsco.support;
 
+import com.google.common.base.Function;
 import net.peachjean.itsco.support.example.ExampleItsco;
 import org.junit.Test;
 
@@ -23,5 +24,15 @@ public class ItscoFactorySupportTest {
         assertEquals("I am zee value!", exampleItsco.getValue1());
         assertEquals("secondValue", exampleItsco.getValue2());
         assertEquals(88, exampleItsco.getIntValue().intValue());
+
+        Function<Properties, ExampleItsco> generator = factory.createGenerator(ExampleItsco.class);
+
+        ExampleItsco exampleItsco2 = generator.apply(props);
+
+        assertEquals("I am zee value!", exampleItsco.getValue1());
+        assertEquals("secondValue", exampleItsco.getValue2());
+        assertEquals(88, exampleItsco.getIntValue().intValue());
     }
+
+
 }
