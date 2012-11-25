@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  *
  */
-public abstract class ItscoFactorySupport<C> implements ContextAccessor<C> {
+public abstract class ItscoFactorySupport<C> implements ContextAccessor<C>, ItscoFactory<C> {
 
     private final Instantiator instantiator = new Instantiator();
     private final FieldResolutionStrategy[] strategies = {
@@ -22,10 +22,12 @@ public abstract class ItscoFactorySupport<C> implements ContextAccessor<C> {
     protected ItscoFactorySupport() {
     }
 
+    @Override
     public <T> T create(C context, Class<T> itscoClass) {
         return instantiator.lookupFunction(itscoClass).apply(createBacker(context));
     }
 
+    @Override
     public <T> Function<C, T> createGenerator(final Class<T> itscoClass)
     {
         return new Function<C, T>() {
