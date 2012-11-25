@@ -1,15 +1,23 @@
 package net.peachjean.itsco.support;
 
 import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.base.Objects;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import javassist.*;
 import javassist.bytecode.AccessFlag;
 import org.apache.commons.lang.RandomStringUtils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 class Instantiator {
@@ -78,12 +86,15 @@ class Instantiator {
 
             implCC.addConstructor(ctConstructor);
 
+            Map<String, String> propertyToMethodCallMap = Maps.newHashMap();
+            // setup getters
             for(CtMethod method: itscoInterface.getMethods())
             {
                 if(isGetter(method))
                 {
                     CtMethod defaultsMethod = defaultsClass.getMethod(method.getName(), method.getSignature());
                     String propertyName = determinePropertyName(method);
+                    propertyToMethodCallMap.put(propertyName, method.getName() + "()");
                     final String returnType = method.getReturnType().getName();
                     String methodBody = defaultsMethod == null || Modifier.isAbstract(defaultsMethod.getModifiers())
                             ? String.format("return (%s) backer.lookup(\"%s\", %s.class);", returnType, propertyName, returnType)
@@ -99,6 +110,42 @@ class Instantiator {
                     implCC.addMethod(implMethod);
                 }
             }
+
+            final Collection<String> methodCalls = propertyToMethodCallMap.values();
+
+            // setup hashcode method
+            String hashCodeBody = String.format("return com.google.common.base.Objects.hashCode(new Object[] {%s});", Joiner.on(",").join(methodCalls));
+            CtClass intType = pool.get("int");
+            CtMethod hashCodeMethod = CtNewMethod.make(intType, "hashCode", new CtClass[0], new CtClass[0], hashCodeBody, implCC);
+            implCC.addMethod(hashCodeMethod);
+
+            // setup equals method
+            StringBuilder equalsBody = new StringBuilder("{\n");
+            equalsBody.append(String.format("if (!($1 instanceof %s)) { return false; }%n", itscoClass.getCanonicalName()));
+            equalsBody.append(String.format("final %s other = (%s) $1;%n", itscoClass.getCanonicalName(), itscoClass.getCanonicalName()));
+            for(String methodCall: methodCalls)
+            {
+                equalsBody.append(String.format("if(!%s.equal(this.%s, other.%s)) { return false; }%n", Objects.class.getName(), methodCall, methodCall));
+            }
+            equalsBody.append("return true;\n");
+            equalsBody.append("}\n");
+            CtClass boolType = pool.get("boolean");
+            CtClass objectType = pool.get(Object.class.getName());
+            CtMethod equalsMethod = CtNewMethod.make(boolType, "equals", new CtClass[]{objectType}, new CtClass[0], equalsBody.toString(), implCC);
+            implCC.addMethod(equalsMethod);
+
+            // setup toString method
+            StringBuilder toStringBody = new StringBuilder("{\n");
+            toStringBody.append(String.format("return %s.toStringHelper(%s.class)%n", Objects.class.getName(), itscoClass.getCanonicalName()));
+            for(String property: propertyToMethodCallMap.keySet())
+            {
+                toStringBody.append(String.format(".add(\"%s\", this.%s)%n", property, propertyToMethodCallMap.get(property)));
+            }
+            toStringBody.append(".toString();\n");
+            toStringBody.append("}");
+            CtClass stringType = pool.get(String.class.getName());
+            CtMethod toStringMethod = CtNewMethod.make(stringType, "toString", new CtClass[0], new CtClass[0], toStringBody.toString(), implCC);
+            implCC.addMethod(toStringMethod);
 
             return classFromCtClass(implCC);
         }

@@ -14,6 +14,10 @@
     <name>ITSCO</name>
     <description>Immutable Type-Safe Configuration Objects</description>
 
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
