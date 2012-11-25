@@ -100,8 +100,8 @@ Non-Obvious Needs
 2. Subtype of field B determined by field A OR subtype of field A determined by a key in A - this supports configuration
    that defines a specific implementation to be used when specific implementations have different configuration objects.
 3. Support changes between versions of itsco interfaces
-   * adding a field, removing a field, changing a type, changing a name, changing cardinality
-   * testing that old versions are still compatible
+    * adding a field, removing a field, changing a type, changing a name, changing cardinality
+    * testing that old versions are still compatible
 4. Discoverability - shall be able to dynamically describe available configuration
 5. Listeners on configuration change - some configuration will be used to create other objects - when the configuration
    changes, these objects will need to be modified
@@ -112,23 +112,23 @@ Itsco Supporting Features
 Planned features, with supporting use cases
 
 * Build-time generated Builder class that allows copying
-  * (2) - instantiate for returning in APIs
-  * (3) - clients instantiate
+    * (2) - instantiate for returning in APIs
+    * (3) - clients instantiate
 * Configuration-backed, runtime-generated, dynamic implementations
-  * (1) - load configs as objects and keep the objects up-to-date as the configuration changes
+    * (1) - load configs as objects and keep the objects up-to-date as the configuration changes
 * Runtime-generated unmarshalled implementation
-  * (2) - recreating objects on receiving side
+    * (2) - recreating objects on receiving side
 * Runtime-generated marshaller
-  * (2) - sending side object to stream conversion
+    * (2) - sending side object to stream conversion
 * Support config-keyed subclasses of itsco fields where parents don't need to know about the impls
-  * (1) - one key specifies an impl, each impl has its own configuration, impl can be plugins that are deployed with no
+    * (1) - one key specifies an impl, each impl has its own configuration, impl can be plugins that are deployed with no
           knowledge by the parent
 * Pluggable backing mechanisms
-  * (3) - user has custom format or DB Schema
+    * (3) - user has custom format or DB Schema
 * Pluggable type conversions
-  * (1,2,3) - user has custom types that need to be supported
+    * (1,2,3) - user has custom types that need to be supported
 * Support "valueOf" static methods
 * Support "Optional" type (from Guava)
-  * (1) - sometimes a default doesn't cut it - we want to know that it is unspecified
+    * (1) - sometimes a default doesn't cut it - we want to know that it is unspecified
 * Support Collections (Map, List, Collection (list), Iterable (list), Set, SortedSet, NavigableSet, Multiset,
                        Multimap, Table)
