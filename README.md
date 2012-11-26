@@ -105,6 +105,8 @@ Non-Obvious Needs
 4. Discoverability - shall be able to dynamically describe available configuration
 5. Listeners on configuration change - some configuration will be used to create other objects - when the configuration
    changes, these objects will need to be modified
+6. Schema generators - should be able to generate an xml schema, json schema, db schema, etc based on the itsco.
+7. Should support JSR-303 annotations on getters.
 
 Itsco Supporting Features
 -------------------------

@@ -1,0 +1,72 @@
+builder(itsco) ::= <<
+package <itsco.packageName>;
+
+import com.google.common.collect.Sets;
+import net.peachjean.itsco.ItscoBuilder;
+import org.apache.bval.jsr303.ApacheValidationProvider;
+
+import javax.inject.Named;
+import javax.validation.*;
+import java.util.Set;
+
+@SuppressWarnings("UnusedDeclaration")
+public class <itsco.builderName> implements ItscoBuilder\<<itsco.name>\> {
+
+  <itsco.props:{p|private <p.type> <p.name>;};separator="\n">
+
+  private final Validator validator;
+  private final <itsco.name> current = new <itsco.defaultsName>() {
+    <itsco.props:{p|public <p.type> get<p.capName>() {
+      return <if(p.required)><p.name><else><p.name> != null ? <p.name> : super.get<p.capName>()<endif>;
+    \}};separator="\n\n">
+  };
+
+  private <itsco.builderName>() {
+    ValidatorFactory validationFactory = Validation.byProvider(ApacheValidationProvider.class).configure().buildValidatorFactory();
+    this.validator = validationFactory.getValidator();
+  }
+
+  public <itsco.builderName>(final <itsco.name> source) {
+    this();
+    <itsco.props:{p|this.<p.name> = source.get<p.capName>();};separator="\n">
+  }
+
+  public <itsco.builderName>(<itsco.requiredProps:{p|@Named("<p.name>") final <p.type> <p.name>};separator=",">) {
+    this();
+    <itsco.requiredProps:{p|this.<p.name>=<p.name>;};separator="\n">
+  }
+
+  <itsco.props:{p|public <itsco.builderName> with<p.capName>(final <p.type> <p.name>) {
+    this.<p.name> = <p.name>;
+    return this;
+  \}};separator="\n\n">
+
+  @Override
+  public void validate() {
+    final Set\<ConstraintViolation\<?\>\> violations = Sets.newHashSet();
+    violations.addAll(validator.validate(current));
+    if(!violations.isEmpty())
+    {
+        throw new ConstraintViolationException("Invalid bean state.", violations);
+    }
+  }
+
+  @Override
+  public <itsco.name> build() {
+    this.validate();
+    return new Impl(<itsco.props:{p|<p.name>};separator=",">);
+  }
+
+  private static class Impl extends <itsco.defaultsName> {
+    <itsco.props:{p|private final <p.type> <p.name>;};separator="\n">
+
+    private Impl(<itsco.props:{p|final <p.type> <p.name>};separator=",">) {
+      <itsco.props:{p|this.<p.name> = <p.name>;};separator="\n">
+    }
+
+    <itsco.props:{p|public <p.type> get<p.capName>() {
+      return <if(p.required)>this.<p.name><else>this.<p.name> != null ? this.<p.name> : super.get<p.capName>()<endif>;
+    \}};separator="\n\n">
+  }
+}
+>>

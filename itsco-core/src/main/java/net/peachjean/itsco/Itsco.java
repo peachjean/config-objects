@@ -22,4 +22,6 @@ import static java.lang.annotation.RetentionPolicy.*;
 @Target(TYPE)
 @Inherited
 public @interface Itsco {
+    boolean generateBuilder() default true;
+    String builderName() default "";
 }
