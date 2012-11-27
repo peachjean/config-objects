@@ -1,2 +1,5 @@
-Create annotation processor for generating Builder           | owner:, open:True, id:bffab583638b5022ed3342736a15dd3ecfac0b3b, time:1353885690.65
+Add support for collections.                                 | owner:, open:True, id:48090a115c3371db50d8f954161721e385a76b81, time:1353942966.28
+Add support for cli backing                                  | owner:, open:True, id:88776c47644b4850cb3cec30e5fa854ad2139b9b, time:1353988077.59
+Create annotation processor for generating Builder           | owner:, open:False, id:bffab583638b5022ed3342736a15dd3ecfac0b3b, time:1353885690.65
+Transition config-backed itsco to use listeners and event notifications rather than constant lookup | owner:, open:True, id:e8e866f575ee00f711b51335591e289822bd0dc3, time:1353943047.44
 Add support for JSR-303 to dynamic impl                      | owner:, open:True, id:f65ddc23d3f056fff912594ceed1be66f7483d6e, time:1353885725.96
