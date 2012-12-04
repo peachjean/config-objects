@@ -3,8 +3,10 @@ package net.peachjean.itsco.support;
 import com.google.common.base.Function;
 import net.peachjean.itsco.support.example.ExampleItsco;
 import net.peachjean.itsco.support.example.ExampleItscoImpl;
+import net.peachjean.itsco.support.example.PrimitiveItsco;
 import org.easymock.EasyMock;
 import org.hamcrest.Matchers;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.easymock.EasyMock.expect;
@@ -99,5 +101,36 @@ public class InstantiatorTest {
 
         assertNotNull(generated);
         assertEquals(hardCoded.toString(), generated.toString());
+    }
+
+    @Test
+    @Ignore
+    public void testPrimitive()
+    {
+        ItscoBacker backer = EasyMock.createMock(ItscoBacker.class);
+
+        expect(backer.lookup("booleanValue", boolean.class)).andReturn(false);
+        expect(backer.lookup("byteValue", byte.class)).andReturn((byte)0xFE);
+        expect(backer.lookup("charValue", char.class)).andReturn('x');
+        expect(backer.lookup("shortValue", short.class)).andReturn((short)3);
+        expect(backer.lookup("intValue", int.class)).andReturn(12);
+        expect(backer.lookup("longValue", long.class)).andReturn(49l);
+        expect(backer.lookup("floatValue", float.class)).andReturn(55.555f);
+        expect(backer.lookup("doubleValue", double.class)).andReturn(23.39389);
+
+        EasyMock.replay(backer);
+
+        Instantiator underTest = new Instantiator();
+
+        final PrimitiveItsco generated = underTest.lookupFunction(PrimitiveItsco.class).apply(backer);
+
+        assertEquals(false, generated.getBooleanValue());
+        assertEquals(0xFE, generated.getByteValue());
+        assertEquals('x', generated.getCharValue());
+        assertEquals(3, generated.getShortValue());
+        assertEquals(12, generated.getIntValue());
+        assertEquals(49l, generated.getLongValue());
+        assertEquals(55.555f, generated.getFloatValue(), 0.00002);
+        assertEquals(23.39389, generated.getDoubleValue(), 0.000002);
     }
 }
