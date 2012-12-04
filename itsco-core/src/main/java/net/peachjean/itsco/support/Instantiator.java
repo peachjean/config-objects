@@ -72,7 +72,7 @@ public class Instantiator {
                 }
 
                 @Override
-                public void visitSimple(final String name, final Method method, final Class<?> propertyType, final boolean required, final CtClassBuilder<T> input) {
+                public <P> void visitSimple(final String name, final Method method, final Class<P> propertyType, final boolean required, final CtClassBuilder<T> input) {
                     // create method
                     final String returnType = propertyType.getName();
                     String methodBody = required
@@ -90,7 +90,7 @@ public class Instantiator {
                 }
 
                 @Override
-                public void visitPrimitive(final String name, final Method method, final Class<?> propertyType, final boolean required, final CtClassBuilder<T> input) {
+                public <P> void visitPrimitive(final String name, final Method method, final Class<P> propertyType, final boolean required, final CtClassBuilder<T> input) {
                     // create method
                     final String returnType = Primitives.wrap(propertyType).getName();
                     String methodBody = required
@@ -108,7 +108,7 @@ public class Instantiator {
                 }
 
                 @Override
-                public void visitItsco(final String name, final Method method, final Class<?> propertyType, final boolean required, final CtClassBuilder<T> input) {
+                public <P> void visitItsco(final String name, final Method method, final Class<P> propertyType, final boolean required, final CtClassBuilder<T> input) {
                     this.visitSimple(name, method, propertyType, required, input);
                 }
             }).build();
