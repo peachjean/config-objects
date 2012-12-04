@@ -8,6 +8,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.primitives.Primitives;
 import javassist.*;
 import javassist.bytecode.AccessFlag;
 import javassist.bytecode.Descriptor;
@@ -86,7 +87,24 @@ public class Instantiator {
                     input.addMemberComparison(String.format("!%s.equal(this.%s, other.%s)", Objects.class.getName(), methodCall, methodCall));
                     // add toString line
                     input.addToStringPair(name, methodCall);
+                }
 
+                @Override
+                public void visitPrimitive(final String name, final Method method, final Class<?> propertyType, final boolean required, final CtClassBuilder<T> input) {
+                    // create method
+                    final String returnType = Primitives.wrap(propertyType).getName();
+                    String methodBody = required
+                            ? String.format("return ((%s) backer.lookup(\"%s\", %s.class)).%sValue();", returnType, name, returnType, propertyType.getName())
+                            : String.format("return ((%s) backer.lookup(\"%s\", %s.class, %s.valueOf(super.%s()))).%sValue();", returnType, name, returnType, returnType, method.getName(), propertyType.getName());
+                    input.createMethod(method.getModifiers() & ~Modifier.ABSTRACT, propertyType, method.getName(), methodBody);
+
+                    final String methodCall = method.getName() + "()";
+                    // add hashCode line
+                    input.addHashCodeMember(String.format("%s.valueOf(%s)", returnType, methodCall));
+                    // add equals line
+                    input.addMemberComparison(String.format("this.%s != other.%s", methodCall, methodCall));
+                    // add toString line
+                    input.addToStringPair(name, methodCall);
                 }
 
                 @Override

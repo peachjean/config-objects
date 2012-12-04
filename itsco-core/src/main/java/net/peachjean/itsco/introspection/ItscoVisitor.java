@@ -9,5 +9,7 @@ public interface ItscoVisitor<T,I> {
 
     void visitItsco(String name, Method method, Class<?> propertyType, boolean required, I input);
 
+    void visitPrimitive(String name, Method method, Class<?> propertyType, boolean required, I input);
+
     void visitDefaults(Class<? extends T> defaultsClass, I input);
 }

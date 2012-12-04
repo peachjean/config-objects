@@ -33,8 +33,9 @@ public class ItscoIntrospector {
                 }
                 if(isItsco(p.getPropertyType())) {
                     visitor.visitItsco(p.getName(), p.getReadMethod(), p.getPropertyType(), isRequired(itscoType, p.getReadMethod()), input);
-                }
-                else {
+                } else if(p.getPropertyType().isPrimitive()) {
+                    visitor.visitPrimitive(p.getName(), p.getReadMethod(), p.getPropertyType(), isRequired(itscoType, p.getReadMethod()), input);
+                } else {
                     visitor.visitSimple(p.getName(), p.getReadMethod(), p.getPropertyType(), isRequired(itscoType, p.getReadMethod()), input);
                 }
             }

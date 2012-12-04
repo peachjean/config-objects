@@ -104,19 +104,18 @@ public class InstantiatorTest {
     }
 
     @Test
-    @Ignore
     public void testPrimitive()
     {
         ItscoBacker backer = EasyMock.createMock(ItscoBacker.class);
 
-        expect(backer.lookup("booleanValue", boolean.class)).andReturn(false);
-        expect(backer.lookup("byteValue", byte.class)).andReturn((byte)0xFE);
-        expect(backer.lookup("charValue", char.class)).andReturn('x');
-        expect(backer.lookup("shortValue", short.class)).andReturn((short)3);
-        expect(backer.lookup("intValue", int.class)).andReturn(12);
-        expect(backer.lookup("longValue", long.class)).andReturn(49l);
-        expect(backer.lookup("floatValue", float.class)).andReturn(55.555f);
-        expect(backer.lookup("doubleValue", double.class)).andReturn(23.39389);
+        expect(backer.lookup("booleanValue", Boolean.class)).andReturn(false);
+        expect(backer.lookup("byteValue", Byte.class)).andReturn((byte)0xFE);
+        expect(backer.lookup("charValue", Character.class)).andReturn('x');
+        expect(backer.lookup("shortValue", Short.class)).andReturn((short)3);
+        expect(backer.lookup("intValue", Integer.class)).andReturn(12);
+        expect(backer.lookup("longValue", Long.class)).andReturn(49l);
+        expect(backer.lookup("floatValue", Float.class)).andReturn(55.555f);
+        expect(backer.lookup("doubleValue", Double.class)).andReturn(23.39389);
 
         EasyMock.replay(backer);
 
@@ -125,7 +124,7 @@ public class InstantiatorTest {
         final PrimitiveItsco generated = underTest.lookupFunction(PrimitiveItsco.class).apply(backer);
 
         assertEquals(false, generated.getBooleanValue());
-        assertEquals(0xFE, generated.getByteValue());
+        assertEquals((byte)0xFE, generated.getByteValue());
         assertEquals('x', generated.getCharValue());
         assertEquals(3, generated.getShortValue());
         assertEquals(12, generated.getIntValue());
