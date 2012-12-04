@@ -117,11 +117,22 @@ public class InstantiatorTest {
         expect(backer.lookup("floatValue", Float.class)).andReturn(55.555f);
         expect(backer.lookup("doubleValue", Double.class)).andReturn(23.39389);
 
+        expect(backer.lookup("booleanValue2", Boolean.class, PrimitiveItsco.DEFAULT_BOOLEAN)).andReturn(false);
+        expect(backer.lookup("byteValue2", Byte.class, (byte)PrimitiveItsco.DEFAULT_BYTE)).andReturn((byte)0xFE);
+        expect(backer.lookup("charValue2", Character.class, PrimitiveItsco.DEFAULT_CHAR)).andReturn('x');
+        expect(backer.lookup("shortValue2", Short.class, (short)PrimitiveItsco.DEFAULT_SHORT)).andReturn((short)3);
+        expect(backer.lookup("intValue2", Integer.class, PrimitiveItsco.DEFAULT_INT)).andReturn(12);
+        expect(backer.lookup("longValue2", Long.class, PrimitiveItsco.DEFAULT_LONG)).andReturn(49l);
+        expect(backer.lookup("floatValue2", Float.class, PrimitiveItsco.DEFAULT_FLOAT)).andReturn(55.555f);
+        expect(backer.lookup("doubleValue2", Double.class, PrimitiveItsco.DEFAULT_DOUBLE)).andReturn(23.39389);
+
         EasyMock.replay(backer);
 
         Instantiator underTest = new Instantiator();
 
         final PrimitiveItsco generated = underTest.lookupFunction(PrimitiveItsco.class).apply(backer);
+
+        assertNotNull(generated);
 
         assertEquals(false, generated.getBooleanValue());
         assertEquals((byte)0xFE, generated.getByteValue());
@@ -131,5 +142,14 @@ public class InstantiatorTest {
         assertEquals(49l, generated.getLongValue());
         assertEquals(55.555f, generated.getFloatValue(), 0.00002);
         assertEquals(23.39389, generated.getDoubleValue(), 0.000002);
+
+        assertEquals(false, generated.getBooleanValue2());
+        assertEquals((byte)0xFE, generated.getByteValue2());
+        assertEquals('x', generated.getCharValue2());
+        assertEquals(3, generated.getShortValue2());
+        assertEquals(12, generated.getIntValue2());
+        assertEquals(49l, generated.getLongValue2());
+        assertEquals(55.555f, generated.getFloatValue2(), 0.00002);
+        assertEquals(23.39389, generated.getDoubleValue2(), 0.000002);
     }
 }
