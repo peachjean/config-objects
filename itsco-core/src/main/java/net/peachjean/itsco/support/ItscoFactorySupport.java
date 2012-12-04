@@ -74,17 +74,18 @@ public abstract class ItscoFactorySupport<C> implements ContextAccessor<C>, Itsc
                 return resolved != null ? resolved : defaultValue;
             }
 
-            private <T> FieldResolutionStrategy determineStrategy(final Class<T> lookupType) {
-                for(FieldResolutionStrategy strategy: strategies)
-                {
-                    if(strategy.supports(lookupType))
-                    {
-                        return strategy;
-                    }
-                }
-                throw new IllegalStateException("No strategy to support type " + lookupType.getName());
-            }
         };
+    }
+
+    protected <T> FieldResolutionStrategy determineStrategy(final Class<T> lookupType) {
+        for(FieldResolutionStrategy strategy: strategies)
+        {
+            if(strategy.supports(lookupType))
+            {
+                return strategy;
+            }
+        }
+        throw new IllegalStateException("No strategy to support type " + lookupType.getName());
     }
 
     private class ItscoResolutionStrategy implements FieldResolutionStrategy {

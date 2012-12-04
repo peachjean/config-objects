@@ -31,9 +31,9 @@ public class ValueOfResolutionStrategy implements FieldResolutionStrategy {
             }
             return lookupType.cast(m.invoke(null, value));
         } catch (InvocationTargetException e) {
-            throw new IllegalStateException("Could not invoke valueOf method on " + lookupType);
+            throw new IllegalStateException("Could not invoke valueOf method on " + lookupType, e);
         } catch (IllegalAccessException e) {
-            throw new IllegalStateException("Could not invoke valueOf method on " + lookupType);
+            throw new IllegalStateException("Could not invoke valueOf method on " + lookupType, e);
         }
     }
 
