@@ -4,6 +4,7 @@ import com.google.common.base.Function;
 import net.peachjean.itsco.support.example.ExampleItsco;
 import net.peachjean.itsco.support.example.ExampleItscoImpl;
 import net.peachjean.itsco.support.example.PrimitiveItsco;
+import org.apache.commons.collections.Transformer;
 import org.easymock.EasyMock;
 import org.hamcrest.Matchers;
 import org.junit.Ignore;
@@ -26,9 +27,9 @@ public class InstantiatorTest {
 
         Instantiator underTest = new Instantiator();
 
-        final Function<ItscoBacker,ExampleItsco> generator = underTest.lookupFunction(ExampleItsco.class);
+        final Transformer<ItscoBacker,ExampleItsco> generator = underTest.lookupFunction(ExampleItsco.class);
 
-        final ExampleItsco itsco1 = generator.apply(backer);
+        final ExampleItsco itsco1 = generator.transform(backer);
 
         assertNotNull(itsco1);
         assertEquals(88, itsco1.getIntValue().intValue());
@@ -66,10 +67,10 @@ public class InstantiatorTest {
 
         Instantiator underTest = new Instantiator();
 
-        final Function<ItscoBacker,ExampleItsco> generator = underTest.lookupFunction(ExampleItsco.class);
+        final Transformer<ItscoBacker,ExampleItsco> generator = underTest.lookupFunction(ExampleItsco.class);
 
-        final ExampleItsco itsco1 = generator.apply(backer);
-        final ExampleItsco itsco2 = generator.apply(backer);
+        final ExampleItsco itsco1 = generator.transform(backer);
+        final ExampleItsco itsco2 = generator.transform(backer);
 
         assertNotNull(itsco1);
         assertNotNull(itsco2);
@@ -77,7 +78,7 @@ public class InstantiatorTest {
         assertEquals(itsco1.hashCode(), itsco2.hashCode());
         assertEquals(itsco1,  itsco2);
 
-        final ExampleItsco itsco3 = generator.apply(otherBacker);
+        final ExampleItsco itsco3 = generator.transform(otherBacker);
 
         assertNotNull(itsco3);
         assertThat(itsco1, Matchers.not(Matchers.equalTo(itsco3     )));
@@ -96,7 +97,7 @@ public class InstantiatorTest {
 
         Instantiator underTest = new Instantiator();
 
-        final ExampleItsco generated = underTest.lookupFunction(ExampleItsco.class).apply(backer);
+        final ExampleItsco generated = underTest.lookupFunction(ExampleItsco.class).transform(backer);
         final ExampleItsco hardCoded = new ExampleItscoImpl(backer);
 
         assertNotNull(generated);
@@ -130,7 +131,7 @@ public class InstantiatorTest {
 
         Instantiator underTest = new Instantiator();
 
-        final PrimitiveItsco generated = underTest.lookupFunction(PrimitiveItsco.class).apply(backer);
+        final PrimitiveItsco generated = underTest.lookupFunction(PrimitiveItsco.class).transform(backer);
 
         assertNotNull(generated);
 

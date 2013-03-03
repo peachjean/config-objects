@@ -1,6 +1,5 @@
 package net.peachjean.itsco.cli;
 
-import com.google.common.collect.ImmutableMap;
 import net.peachjean.itsco.introspection.ItscoIntrospector;
 import net.peachjean.itsco.introspection.ItscoVisitor;
 import org.apache.commons.cli.CommandLine;
@@ -9,9 +8,9 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.Parser;
 import org.apache.commons.configuration.Configuration;
 
-import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public class GnuCliItscoParser implements CliItscoParser {
 
@@ -36,11 +35,11 @@ public class GnuCliItscoParser implements CliItscoParser {
 
     private static class DescriptorBuilder {
 
-        private final ImmutableMap.Builder<String, OptionDetails> detailsBuilder = ImmutableMap.builder();
-        private final ImmutableMap.Builder<String, OptionsDescriptor> descriptorBuilder = ImmutableMap.builder();
+        private final Map<String, OptionDetails> detailsBuilder = new HashMap<String, OptionDetails>();
+        private final Map<String, OptionsDescriptor> descriptorBuilder = new HashMap<String, OptionsDescriptor>();
 
         public OptionsDescriptor build() {
-            return new OptionsDescriptor(detailsBuilder.build(), descriptorBuilder.build());
+            return new OptionsDescriptor(detailsBuilder, descriptorBuilder);
         }
 
         public void add(final String name, final OptionsDescriptor descriptor) {

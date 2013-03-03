@@ -1,28 +1,27 @@
 package net.peachjean.itsco.cli;
 
-import com.google.common.collect.ImmutableMap;
-import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
-import org.omg.CORBA.StringHolder;
+
+import java.util.Map;
 
 /**
  * A map from a property name to an "OptionDetails" object.  OptionDetails provides the ability to query for a
  * particular option from a CommandLine
  */
 public class OptionsDescriptor {
-    private final ImmutableMap<String, OptionDetails> detailsMap;
-    private final ImmutableMap<String, OptionsDescriptor> subDescriptorMap;
+    private final Map<String, OptionDetails> detailsMap;
+    private final Map<String, OptionsDescriptor> subDescriptorMap;
 
-    public OptionsDescriptor(final ImmutableMap<String, OptionDetails> detailsMap, final ImmutableMap<String, OptionsDescriptor> subDescriptorMap) {
+    public OptionsDescriptor(final Map<String, OptionDetails> detailsMap, final Map<String, OptionsDescriptor> subDescriptorMap) {
         this.detailsMap = detailsMap;
         this.subDescriptorMap = subDescriptorMap;
     }
 
-    ImmutableMap<String, OptionDetails> getDetailsMap() {
+    Map<String, OptionDetails> getDetailsMap() {
         return detailsMap;
     }
 
-    ImmutableMap<String, OptionsDescriptor> getSubDescriptorMap() {
+    Map<String, OptionsDescriptor> getSubDescriptorMap() {
         return subDescriptorMap;
     }
 

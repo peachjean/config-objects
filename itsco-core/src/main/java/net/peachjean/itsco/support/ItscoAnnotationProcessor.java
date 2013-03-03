@@ -1,14 +1,11 @@
 package net.peachjean.itsco.support;
 
-import com.google.common.base.Charsets;
-import com.google.common.base.Throwables;
-import com.google.common.collect.Lists;
-import com.google.common.io.Closeables;
-import com.google.common.io.OutputSupplier;
-import com.google.common.io.Resources;
+import org.apache.commons.io.Charsets;
 import net.peachjean.itsco.Itsco;
 import net.peachjean.tater.utils.TypeSourceFormatter;
 import net.peachjean.tater.utils.Utils;
+import org.apache.bval.jsr303.util.IOUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.stringtemplate.v4.AutoIndentWriter;
 import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
@@ -20,9 +17,10 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.*;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -67,14 +65,9 @@ public class ItscoAnnotationProcessor extends AbstractProcessor {
                     try {
                         final JavaFileObject sourceFile = processingEnv.getFiler().createSourceFile(packageName + "." + implName, element);
 
-                        this.writeBuilderSource(templateModel, new OutputSupplier<Writer>() {
-                            @Override
-                            public Writer getOutput() throws IOException {
-                                return sourceFile.openWriter();
-                            }
-                        });
+                        this.writeBuilderSource(templateModel, sourceFile.openWriter());
                     } catch (IOException e) {
-                        processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, Throwables.getRootCause(e).getMessage(), element);
+                        processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, ExceptionUtils.getRootCauseMessage(e), element);
                     }
                 } catch (IllegalStateException e) {
                     processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, e.getMessage(), element);
@@ -92,7 +85,7 @@ public class ItscoAnnotationProcessor extends AbstractProcessor {
     }
 
     private List<ItscoBuilderTemplateModel.Prop> buildPropList(final TypeElement serviceElement) {
-        List<ItscoBuilderTemplateModel.Prop> propList = Lists.newArrayList();
+        List<ItscoBuilderTemplateModel.Prop> propList = new ArrayList<ItscoBuilderTemplateModel.Prop>();
 
         TypeElement defaultsClass = getInnerClass(serviceElement, "Defaults");
         if(defaultsClass == null)
@@ -118,18 +111,21 @@ public class ItscoAnnotationProcessor extends AbstractProcessor {
         return propList;
     }
 
-    private void writeBuilderSource(ItscoBuilderTemplateModel templateModel, OutputSupplier<Writer> writerSupplier) throws IOException {
-        STGroup stGroup = new STGroupFile(Resources.getResource(ItscoAnnotationProcessor.class, "builder.stg"), Charsets.UTF_8.name(), '<', '>');
+    private void writeBuilderSource(ItscoBuilderTemplateModel templateModel, Writer writer) throws IOException {
+        STGroup stGroup = new STGroupFile(locateTemplate(), Charsets.UTF_8.name(), '<', '>');
         ST typeTemplate = stGroup.getInstanceOf("builder");
 
         typeTemplate.add("itsco", templateModel);
-        Writer writer = writerSupplier.getOutput();
         try {
             typeTemplate.write(new AutoIndentWriter(writer, "\n"));
         } finally {
-            Closeables.close(writer, false);
+            IOUtils.closeQuietly(writer);
         }
 
+    }
+
+    private URL locateTemplate() {
+        return this.getClass().getResource("builder.stg");
     }
 
     private PackageElement getPackage(final Element serviceElement) {

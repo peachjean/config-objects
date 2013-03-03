@@ -1,9 +1,9 @@
 package net.peachjean.itsco.support;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Maps;
 import net.peachjean.itsco.Itsco;
+import org.apache.commons.collections.Transformer;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -24,18 +24,18 @@ public abstract class ItscoFactorySupport<C> implements ContextAccessor<C>, Itsc
 
     @Override
     public <T> T create(C context, Class<T> itscoClass) {
-        return instantiator.lookupFunction(itscoClass).apply(createBacker(context));
+        return instantiator.lookupFunction(itscoClass).transform(createBacker(context));
     }
 
     @Override
-    public <T> Function<C, T> createGenerator(final Class<T> itscoClass)
+    public <T> Transformer<C, T> createGenerator(final Class<T> itscoClass)
     {
-        return new Function<C, T>() {
-            final Function<ItscoBacker, T> implFunction = instantiator.lookupFunction(itscoClass);
+        return new Transformer<C, T>() {
+            final Transformer<ItscoBacker, T> implFunction = instantiator.lookupFunction(itscoClass);
 
             @Override
-            public T apply(final C context) {
-                return implFunction.apply(createBacker(context));
+            public T transform(final C context) {
+                return implFunction.transform(createBacker(context));
             }
         };
     }
@@ -45,7 +45,7 @@ public abstract class ItscoFactorySupport<C> implements ContextAccessor<C>, Itsc
 
             // contains values that handle reloading on their own - these are often more expensive to create so we
             // don't want to recreate them on every get call
-            private final Map<String, Object> cachedValues = Maps.newHashMap();
+            private final Map<String, Object> cachedValues = new HashMap<String, Object>();
 
             public <T> T lookup(final String name, final Class<T> lookupType) {
                 FieldResolutionStrategy resolutionStrategy = determineStrategy(lookupType);

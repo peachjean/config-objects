@@ -1,9 +1,7 @@
 package net.peachjean.itsco.support;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
+import org.apache.commons.collections.ListUtils;
+import org.apache.commons.collections.Predicate;
 
 import java.util.List;
 
@@ -21,12 +19,12 @@ public class ItscoBuilderTemplateModel {
         this.defaultsName = defaultsName;
         this.packageName = packageName;
         this.props = props;
-        this.requiredProps = ImmutableList.copyOf(Iterables.filter(this.props, new Predicate<Prop>() {
+        this.requiredProps = ListUtils.select(this.props, new Predicate<Prop>() {
             @Override
-            public boolean apply(final Prop input) {
+            public boolean evaluate(Prop input) {
                 return input.isRequired();
             }
-        }));
+        });
     }
 
     public String getBuilderName() {

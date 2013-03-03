@@ -1,118 +1,116 @@
 package net.peachjean.itsco.support;
 
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.base.Objects;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.primitives.Primitives;
 import javassist.*;
 import javassist.bytecode.AccessFlag;
-import javassist.bytecode.Descriptor;
 import net.peachjean.itsco.introspection.ItscoIntrospector;
 import net.peachjean.itsco.introspection.ItscoVisitor;
+import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang3.ClassUtils;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
+import java.util.*;
 
 public class Instantiator {
-    private final LoadingCache<Class, Function<ItscoBacker, Object>> cache = CacheBuilder.newBuilder().build(new ImplementationGenerator());
+    private final Map<Class, Transformer<ItscoBacker, ?>> cache = new HashMap<Class, Transformer<ItscoBacker, ?>>();
 
     @SuppressWarnings("unchecked")
-    <T> Function<ItscoBacker, T> lookupFunction(final Class<T> itscoInterface) {
-        try {
-            return (Function<ItscoBacker, T>) cache.get(itscoInterface);
-        } catch (ExecutionException e) {
-            throw new RuntimeException("Failed to instantiate itsco " + itscoInterface.getName(), e);
-        }
-    }
-
-    private class ImplementationGenerator extends CacheLoader<Class, Function<ItscoBacker, Object>> {
-        @SuppressWarnings("unchecked")
-        @Override
-        public Function<ItscoBacker, Object> load(final Class itscoClass) throws Exception {
-            return createInstantiationFunction(itscoClass);
-        }
-
-        private <T> Function<ItscoBacker, T> createInstantiationFunction(final Class<T> itscoClass) throws NotFoundException, CannotCompileException, NoSuchMethodException {
-            final Class<? extends T> implClass = createImplClass(itscoClass);
-
-            final Constructor<? extends T> constructor = implClass.getConstructor(ItscoBacker.class);
-
-            return new Function<ItscoBacker, T>() {
-                @Override
-                public T apply(final ItscoBacker input) {
+    <T> Transformer<ItscoBacker, T> lookupFunction(final Class<T> itscoInterface) {
+        if(!cache.containsKey(itscoInterface))
+        {
+            synchronized (cache)
+            {
+                if(!cache.containsKey(itscoInterface))
+                {
                     try {
-                        return constructor.newInstance(input);
-                    } catch (InstantiationException e) {
-                        throw new RuntimeException("Failed to invoke constructor for implementation of " + itscoClass.getName(), e);
-                    } catch (IllegalAccessException e) {
-                        throw new RuntimeException("Failed to invoke constructor for implementation of " + itscoClass.getName(), e);
-                    } catch (InvocationTargetException e) {
-                        throw new RuntimeException("Failed to invoke constructor for implementation of " + itscoClass.getName(), e);
+                        cache.put(itscoInterface, createInstantiationFunction(itscoInterface));
+                    } catch (NotFoundException e) {
+                        throw new RuntimeException("Could not create instantiation function for " + itscoInterface.getName(), e);
+                    } catch (CannotCompileException e) {
+                        throw new RuntimeException("Could not create instantiation function for " + itscoInterface.getName(), e);
+                    } catch (NoSuchMethodException e) {
+                        throw new RuntimeException("Could not create instantiation function for " + itscoInterface.getName(), e);
                     }
                 }
-            };
+            }
         }
+        return (Transformer<ItscoBacker, T>) cache.get(itscoInterface);
+    }
 
-        private <T> Class<? extends T> createImplClass(final Class<T> itscoClass) throws NotFoundException, CannotCompileException {
-            return ItscoIntrospector.visitMembers(itscoClass, new CtClassBuilder<T>(itscoClass), new ItscoVisitor<T, CtClassBuilder<T>>() {
-                @Override
-                public void visitDefaults(final Class<? extends T> defaultsClass, final CtClassBuilder<T> input) {
-                    input.setDefaults(defaultsClass);
+    private <T> Transformer<ItscoBacker, T> createInstantiationFunction(final Class<T> itscoClass) throws NotFoundException, CannotCompileException, NoSuchMethodException {
+        final Class<? extends T> implClass = createImplClass(itscoClass);
+
+        final Constructor<? extends T> constructor = implClass.getConstructor(ItscoBacker.class);
+
+        return new Transformer<ItscoBacker, T>() {
+            @Override
+            public T transform(ItscoBacker input) {
+                try {
+                    return constructor.newInstance(input);
+                } catch (InstantiationException e) {
+                    throw new RuntimeException("Failed to invoke constructor for implementation of " + itscoClass.getName(), e);
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException("Failed to invoke constructor for implementation of " + itscoClass.getName(), e);
+                } catch (InvocationTargetException e) {
+                    throw new RuntimeException("Failed to invoke constructor for implementation of " + itscoClass.getName(), e);
                 }
+            }
+        };
+    }
 
-                @Override
-                public <P> void visitSimple(final String name, final Method method, final Class<P> propertyType, final boolean required, final CtClassBuilder<T> input) {
-                    // create method
-                    final String returnType = propertyType.getName();
-                    String methodBody = required
-                            ? String.format("return (%s) backer.lookup(\"%s\", %s.class);", returnType, name, returnType)
-                            : String.format("return (%s) backer.lookup(\"%s\", %s.class, super.%s());", returnType, name, returnType, method.getName());
-                    input.createMethod(method.getModifiers() & ~Modifier.ABSTRACT, propertyType, method.getName(), methodBody);
+    private <T> Class<? extends T> createImplClass(final Class<T> itscoClass) throws NotFoundException, CannotCompileException {
+        return ItscoIntrospector.visitMembers(itscoClass, new CtClassBuilder<T>(itscoClass), new ItscoVisitor<T, CtClassBuilder<T>>() {
+            @Override
+            public void visitDefaults(final Class<? extends T> defaultsClass, final CtClassBuilder<T> input) {
+                input.setDefaults(defaultsClass);
+            }
 
-                    final String methodCall = method.getName() + "()";
-                    // add hashCode line
-                    input.addHashCodeMember(methodCall);
-                    // add equals line
-                    input.addMemberComparison(String.format("!%s.equal(this.%s, other.%s)", Objects.class.getName(), methodCall, methodCall));
-                    // add toString line
-                    input.addToStringPair(name, methodCall);
-                }
+            @Override
+            public <P> void visitSimple(final String name, final Method method, final Class<P> propertyType, final boolean required, final CtClassBuilder<T> input) {
+                // create method
+                final String returnType = propertyType.getName();
+                String methodBody = required
+                        ? String.format("return (%s) backer.lookup(\"%s\", %s.class);", returnType, name, returnType)
+                        : String.format("return (%s) backer.lookup(\"%s\", %s.class, super.%s());", returnType, name, returnType, method.getName());
+                input.createMethod(method.getModifiers() & ~Modifier.ABSTRACT, propertyType, method.getName(), methodBody);
 
-                @Override
-                public <P> void visitPrimitive(final String name, final Method method, final Class<P> propertyType, final boolean required, final CtClassBuilder<T> input) {
-                    // create method
-                    final String returnType = Primitives.wrap(propertyType).getName();
-                    String methodBody = required
-                            ? String.format("return ((%s) backer.lookup(\"%s\", %s.class)).%sValue();", returnType, name, returnType, propertyType.getName())
-                            : String.format("return ((%s) backer.lookup(\"%s\", %s.class, %s.valueOf(super.%s()))).%sValue();", returnType, name, returnType, returnType, method.getName(), propertyType.getName());
-                    input.createMethod(method.getModifiers() & ~Modifier.ABSTRACT, propertyType, method.getName(), methodBody);
+                final String methodCall = method.getName() + "()";
+                // add hashCode line
+                input.addHashCodeMember(methodCall);
+                // add equals line
+                input.addMemberComparison(String.format("!%s.equals(this.%s, other.%s)", ObjectUtils.class.getName(), methodCall, methodCall));
+                // add toString line
+                input.addToStringPair(name, methodCall);
+            }
 
-                    final String methodCall = method.getName() + "()";
-                    // add hashCode line
-                    input.addHashCodeMember(String.format("%s.valueOf(%s)", returnType, methodCall));
-                    // add equals line
-                    input.addMemberComparison(String.format("this.%s != other.%s", methodCall, methodCall));
-                    // add toString line
-                    input.addToStringPair(name, methodCall);
-                }
+            @Override
+            public <P> void visitPrimitive(final String name, final Method method, final Class<P> propertyType, final boolean required, final CtClassBuilder<T> input) {
+                // create method
+                final String returnType = ClassUtils.primitiveToWrapper(propertyType).getName();
+                String methodBody = required
+                        ? String.format("return ((%s) backer.lookup(\"%s\", %s.class)).%sValue();", returnType, name, returnType, propertyType.getName())
+                        : String.format("return ((%s) backer.lookup(\"%s\", %s.class, %s.valueOf(super.%s()))).%sValue();", returnType, name, returnType, returnType, method.getName(), propertyType.getName());
+                input.createMethod(method.getModifiers() & ~Modifier.ABSTRACT, propertyType, method.getName(), methodBody);
 
-                @Override
-                public <P> void visitItsco(final String name, final Method method, final Class<P> propertyType, final boolean required, final CtClassBuilder<T> input) {
-                    this.visitSimple(name, method, propertyType, required, input);
-                }
-            }).build();
-        }
+                final String methodCall = method.getName() + "()";
+                // add hashCode line
+                input.addHashCodeMember(String.format("%s.valueOf(%s)", returnType, methodCall));
+                // add equals line
+                input.addMemberComparison(String.format("this.%s != other.%s", methodCall, methodCall));
+                // add toString line
+                input.addToStringPair(name, methodCall);
+            }
+
+            @Override
+            public <P> void visitItsco(final String name, final Method method, final Class<P> propertyType, final boolean required, final CtClassBuilder<T> input) {
+                this.visitSimple(name, method, propertyType, required, input);
+            }
+        }).build();
     }
 
     private static class CtClassBuilder<T> {
@@ -122,9 +120,9 @@ public class Instantiator {
         private final ClassPool pool = ClassPool.getDefault();
         private CtClass defaultsCtClass;
 
-        private List<String> hashCodeMembers = Lists.newArrayList();
-        private List<String> memberComparisons = Lists.newArrayList();
-        private Map<String, String> toStringPairs = Maps.newTreeMap();
+        private List<String> hashCodeMembers = new ArrayList<String>();
+        private List<String> memberComparisons = new ArrayList<String>();
+        private Map<String, String> toStringPairs = new TreeMap<String, String>();
 
         public CtClassBuilder(final Class<T> itscoClass) {
             this.itscoClass = itscoClass;
@@ -133,9 +131,14 @@ public class Instantiator {
         public Class<T> build() {
             try {
                 // setup hashcode method
-                String hashCodeBody = String.format("return com.google.common.base.Objects.hashCode(new Object[] {%s});", Joiner.on(",").join(hashCodeMembers));
+                StringBuilder hashCodeBody = new StringBuilder("return new org.apache.commons.lang3.builder.HashCodeBuilder()");
+                for(String hashCodeMember: hashCodeMembers)
+                {
+                    hashCodeBody.append(".append(" + hashCodeMember + ")");
+                }
+                hashCodeBody.append(".build().intValue();");
                 CtClass intType = pool.get("int");
-                CtMethod hashCodeMethod = CtNewMethod.make(intType, "hashCode", new CtClass[0], new CtClass[0], hashCodeBody, implCC);
+                CtMethod hashCodeMethod = CtNewMethod.make(intType, "hashCode", new CtClass[0], new CtClass[0], hashCodeBody.toString(), implCC);
                 implCC.addMethod(hashCodeMethod);
 
                 // setup equals method
@@ -154,11 +157,19 @@ public class Instantiator {
 
                 // setup toString method
                 StringBuilder toStringBody = new StringBuilder("{\n");
-                toStringBody.append(String.format("return %s.toStringHelper(%s.class)%n", Objects.class.getName(), itscoClass.getCanonicalName()));
+
+
+                toStringBody.append(String.format("return \"%s{\" %n", itscoClass.getSimpleName()));
+                boolean first = true;
                 for (String property : toStringPairs.keySet()) {
-                    toStringBody.append(String.format(".add(\"%s\", this.%s)%n", property, toStringPairs.get(property)));
+                    if(first) {
+                        first = false;
+                    } else {
+                        toStringBody.append(" + \", \"\n");
+                    }
+                    toStringBody.append(String.format(" + \"%s=\" + this.%s", property, toStringPairs.get(property)));
                 }
-                toStringBody.append(".toString();\n");
+                toStringBody.append(" + \"}\";\n");
                 toStringBody.append("}");
                 CtClass stringType = pool.get(String.class.getName());
                 CtMethod toStringMethod = CtNewMethod.make(stringType, "toString", new CtClass[0], new CtClass[0], toStringBody.toString(), implCC);

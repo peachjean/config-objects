@@ -1,16 +1,12 @@
 package net.peachjean.itsco.introspection;
 
-import com.google.common.collect.Lists;
 import net.peachjean.itsco.Itsco;
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.beanutils.PropertyUtils;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
-import java.util.Collection;
 
 public class ItscoIntrospector {
     /**

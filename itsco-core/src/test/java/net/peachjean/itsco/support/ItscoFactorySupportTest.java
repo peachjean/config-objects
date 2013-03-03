@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableSet;
 import net.peachjean.itsco.support.example.CompoundItsco;
 import net.peachjean.itsco.support.example.ExampleItsco;
 import org.apache.bval.jsr303.ApacheValidationProvider;
+import org.apache.commons.collections.Transformer;
 import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationConverter;
@@ -36,9 +37,9 @@ public class ItscoFactorySupportTest {
         assertEquals("secondValue", exampleItsco.getValue2());
         assertEquals(88, exampleItsco.getIntValue().intValue());
 
-        Function<Configuration, ExampleItsco> generator = factory.createGenerator(ExampleItsco.class);
+        Transformer<Configuration, ExampleItsco> generator = factory.createGenerator(ExampleItsco.class);
 
-        ExampleItsco exampleItsco2 = generator.apply(config);
+        ExampleItsco exampleItsco2 = generator.transform(config);
 
         assertEquals("I am zee value!", exampleItsco.getValue1());
         assertEquals("secondValue", exampleItsco.getValue2());
