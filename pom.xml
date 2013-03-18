@@ -129,4 +129,31 @@
         </plugins>
     </build>
     
+        <repositories>
+                <repository>
+                        <id>oss-snapshots</id>
+                        <releases>
+                                <enabled>false</enabled>
+                        </releases>
+                        <snapshots>
+                                <enabled>true</enabled>
+                                <checksumPolicy>fail</checksumPolicy>
+                                <updatePolicy>interval:120</updatePolicy>
+                        </snapshots>
+                        <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+                </repository>
+                <repository>
+                        <id>apache-snapshots</id>
+                        <releases>
+                                <enabled>false</enabled>
+                        </releases>
+                        <snapshots>
+                                <enabled>true</enabled>
+                                <checksumPolicy>fail</checksumPolicy>
+                                <updatePolicy>interval:120</updatePolicy>
+                        </snapshots>
+                        <url>https://repository.apache.org/content/groups/snapshots/</url>
+                </repository>
+        </repositories>
+
 </project>
