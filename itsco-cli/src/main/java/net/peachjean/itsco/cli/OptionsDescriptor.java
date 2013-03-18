@@ -34,12 +34,10 @@ public class OptionsDescriptor {
     }
 
     private void addOptions(final Options options) {
-        for(OptionDetails optionDetails: detailsMap.values())
-        {
+        for (OptionDetails optionDetails : detailsMap.values()) {
             options.addOption(optionDetails.getOption());
         }
-        for(OptionsDescriptor descriptor: subDescriptorMap.values())
-        {
+        for (OptionsDescriptor descriptor : subDescriptorMap.values()) {
             descriptor.addOptions(options);
         }
     }

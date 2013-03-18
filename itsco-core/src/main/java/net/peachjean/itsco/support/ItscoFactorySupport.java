@@ -28,8 +28,7 @@ public abstract class ItscoFactorySupport<C> implements ContextAccessor<C>, Itsc
     }
 
     @Override
-    public <T> Transformer<C, T> createGenerator(final Class<T> itscoClass)
-    {
+    public <T> Transformer<C, T> createGenerator(final Class<T> itscoClass) {
         return new Transformer<C, T>() {
             final Transformer<ItscoBacker, T> implFunction = instantiator.lookupFunction(itscoClass);
 
@@ -49,20 +48,16 @@ public abstract class ItscoFactorySupport<C> implements ContextAccessor<C>, Itsc
 
             public <T> T lookup(final String name, final Class<T> lookupType) {
                 FieldResolutionStrategy resolutionStrategy = determineStrategy(lookupType);
-                if(resolutionStrategy.handlesReloading())
-                {
-                    if(cachedValues.containsKey(name))
-                    {
+                if (resolutionStrategy.handlesReloading()) {
+                    if (cachedValues.containsKey(name)) {
                         return lookupType.cast(cachedValues.get(name));
                     }
                 }
                 final T resolved = resolutionStrategy.resolve(name, lookupType, context, ItscoFactorySupport.this);
-                if(resolved == null)
-                {
+                if (resolved == null) {
                     throw new IllegalStateException("No value for " + name);
                 }
-                if(resolutionStrategy.handlesReloading())
-                {
+                if (resolutionStrategy.handlesReloading()) {
                     cachedValues.put(name, resolved);
                 }
                 return resolved;
@@ -78,10 +73,8 @@ public abstract class ItscoFactorySupport<C> implements ContextAccessor<C>, Itsc
     }
 
     protected <T> FieldResolutionStrategy determineStrategy(final Class<T> lookupType) {
-        for(FieldResolutionStrategy strategy: strategies)
-        {
-            if(strategy.supports(lookupType))
-            {
+        for (FieldResolutionStrategy strategy : strategies) {
+            if (strategy.supports(lookupType)) {
                 return strategy;
             }
         }
@@ -91,8 +84,7 @@ public abstract class ItscoFactorySupport<C> implements ContextAccessor<C>, Itsc
     private class ItscoResolutionStrategy implements FieldResolutionStrategy {
         @Override
         public <T, CN> T resolve(final String name, final Class<T> lookupType, final CN context, final ContextAccessor<CN> contextAccessor) {
-            if(!this.supports(lookupType))
-            {
+            if (!this.supports(lookupType)) {
                 throw new IllegalArgumentException("This strategy only supports itsco types, not " + lookupType.getName());
             }
 

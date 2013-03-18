@@ -3,7 +3,7 @@ package net.peachjean.itsco.support.example;
 import com.google.common.base.Objects;
 import net.peachjean.itsco.support.ItscoBacker;
 
-public class ExampleItscoImpl extends ExampleItsco.Defaults implements ExampleItsco  {
+public class ExampleItscoImpl extends ExampleItsco.Defaults implements ExampleItsco {
 
     private final ItscoBacker backer;
 
@@ -32,21 +32,17 @@ public class ExampleItscoImpl extends ExampleItsco.Defaults implements ExampleIt
 
     @Override
     public boolean equals(final Object obj) {
-        if(!(obj instanceof ExampleItsco))
-        {
+        if (!(obj instanceof ExampleItsco)) {
             return false;
         }
         ExampleItsco other = (ExampleItsco) obj;
-        if(!Objects.equal(this.getValue1(), other.getValue1()))
-        {
+        if (!Objects.equal(this.getValue1(), other.getValue1())) {
             return false;
         }
-        if(!Objects.equal(this.getValue2(), other.getValue2()))
-        {
+        if (!Objects.equal(this.getValue2(), other.getValue2())) {
             return false;
         }
-        if(!Objects.equal(this.getIntValue(), other.getIntValue()))
-        {
+        if (!Objects.equal(this.getIntValue(), other.getIntValue())) {
             return false;
         }
         return true;

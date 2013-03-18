@@ -19,17 +19,17 @@ public class ItscoIntrospector {
      * @param <I>
      * @return
      */
-    public static <T,I> I visitMembers(Class<T> itscoType, I input, ItscoVisitor<T,I> visitor) {
+    public static <T, I> I visitMembers(Class<T> itscoType, I input, ItscoVisitor<T, I> visitor) {
         try {
             visitor.visitDefaults(determineDefaults(itscoType), input);
             final BeanInfo beanInfo = Introspector.getBeanInfo(itscoType);
-            for(PropertyDescriptor p: beanInfo.getPropertyDescriptors()) {
-                if(p.getReadMethod() == null) {
+            for (PropertyDescriptor p : beanInfo.getPropertyDescriptors()) {
+                if (p.getReadMethod() == null) {
                     continue;
                 }
-                if(isItsco(p.getPropertyType())) {
+                if (isItsco(p.getPropertyType())) {
                     visitor.visitItsco(p.getName(), p.getReadMethod(), p.getPropertyType(), isRequired(itscoType, p.getReadMethod()), input);
-                } else if(p.getPropertyType().isPrimitive()) {
+                } else if (p.getPropertyType().isPrimitive()) {
                     visitor.visitPrimitive(p.getName(), p.getReadMethod(), p.getPropertyType(), isRequired(itscoType, p.getReadMethod()), input);
                 } else {
                     visitor.visitSimple(p.getName(), p.getReadMethod(), p.getPropertyType(), isRequired(itscoType, p.getReadMethod()), input);
@@ -56,10 +56,8 @@ public class ItscoIntrospector {
     }
 
     private static <T> Class<? extends T> determineDefaults(final Class<T> type) {
-        for(Class<?> enclosedClass: type.getClasses())
-        {
-            if("Defaults".equals(enclosedClass.getSimpleName()))
-            {
+        for (Class<?> enclosedClass : type.getClasses()) {
+            if ("Defaults".equals(enclosedClass.getSimpleName())) {
                 return (Class<? extends T>) enclosedClass;
             }
         }

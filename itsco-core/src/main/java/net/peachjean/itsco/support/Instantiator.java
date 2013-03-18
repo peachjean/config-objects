@@ -8,8 +8,6 @@ import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -21,12 +19,9 @@ public class Instantiator {
 
     @SuppressWarnings("unchecked")
     <T> Transformer<ItscoBacker, T> lookupFunction(final Class<T> itscoInterface) {
-        if(!cache.containsKey(itscoInterface))
-        {
-            synchronized (cache)
-            {
-                if(!cache.containsKey(itscoInterface))
-                {
+        if (!cache.containsKey(itscoInterface)) {
+            synchronized (cache) {
+                if (!cache.containsKey(itscoInterface)) {
                     try {
                         cache.put(itscoInterface, createInstantiationFunction(itscoInterface));
                     } catch (NotFoundException e) {
@@ -132,8 +127,7 @@ public class Instantiator {
             try {
                 // setup hashcode method
                 StringBuilder hashCodeBody = new StringBuilder("return new org.apache.commons.lang3.builder.HashCodeBuilder()");
-                for(String hashCodeMember: hashCodeMembers)
-                {
+                for (String hashCodeMember : hashCodeMembers) {
                     hashCodeBody.append(".append(" + hashCodeMember + ")");
                 }
                 hashCodeBody.append(".build().intValue();");
@@ -162,7 +156,7 @@ public class Instantiator {
                 toStringBody.append(String.format("return \"%s{\" %n", itscoClass.getSimpleName()));
                 boolean first = true;
                 for (String property : toStringPairs.keySet()) {
-                    if(first) {
+                    if (first) {
                         first = false;
                     } else {
                         toStringBody.append(" + \", \"\n");

@@ -13,8 +13,7 @@ public interface ExampleItsco {
     @Max(100)
     Integer getIntValue();
 
-    public static abstract class Defaults implements ExampleItsco
-    {
+    public static abstract class Defaults implements ExampleItsco {
         public String getValue2() {
             return "secondValue";
         }

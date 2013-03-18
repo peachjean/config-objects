@@ -33,14 +33,12 @@ public class ExampleItscoExampleBuilder implements ItscoBuilder<ExampleItsco> {
         }
     };
 
-    private ExampleItscoExampleBuilder()
-    {
+    private ExampleItscoExampleBuilder() {
         ValidatorFactory validationFactory = Validation.byProvider(ApacheValidationProvider.class).configure().buildValidatorFactory();
         validator = validationFactory.getValidator();
     }
 
-    public ExampleItscoExampleBuilder(final ExampleItsco source)
-    {
+    public ExampleItscoExampleBuilder(final ExampleItsco source) {
         this();
         this.value1 = source.getValue1();
         this.value2 = source.getValue2();
@@ -52,20 +50,17 @@ public class ExampleItscoExampleBuilder implements ItscoBuilder<ExampleItsco> {
         this.value1 = value1;
     }
 
-    public ExampleItscoExampleBuilder withValue1(final String value1)
-    {
+    public ExampleItscoExampleBuilder withValue1(final String value1) {
         this.value1 = value1;
         return this;
     }
 
-    public ExampleItscoExampleBuilder withValue2(final String value2)
-    {
+    public ExampleItscoExampleBuilder withValue2(final String value2) {
         this.value2 = value2;
         return this;
     }
 
-    public ExampleItscoExampleBuilder withIntValue(final Integer intValue)
-    {
+    public ExampleItscoExampleBuilder withIntValue(final Integer intValue) {
         this.intValue = intValue;
         return this;
     }
@@ -74,8 +69,7 @@ public class ExampleItscoExampleBuilder implements ItscoBuilder<ExampleItsco> {
     public void validate() {
         final Set<ConstraintViolation<?>> violations = Sets.newHashSet();
         violations.addAll(validator.validate(current));
-        if(!violations.isEmpty())
-        {
+        if (!violations.isEmpty()) {
             throw new ConstraintViolationException("Invalid bean state.", violations);
         }
     }

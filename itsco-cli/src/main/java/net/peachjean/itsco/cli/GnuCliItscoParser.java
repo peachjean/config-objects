@@ -22,7 +22,7 @@ public class GnuCliItscoParser implements CliItscoParser {
 
         try {
             final CommandLine commandLine = parser.parse(optionsDescriptor.buildOptions(), args);
-            return new ParsedOptions(commandLine,  optionsDescriptor,  backingConfig);
+            return new ParsedOptions(commandLine, optionsDescriptor, backingConfig);
         } catch (ParseException e) {
             throw new RuntimeException(e);
         }
@@ -30,7 +30,7 @@ public class GnuCliItscoParser implements CliItscoParser {
 
     @Override
     public <T> OptionsDescriptor buildDescriptor(final Class<T> itscoType) {
-        return ItscoIntrospector.visitMembers(itscoType, new DescriptorBuilder(), (ItscoVisitor<T,DescriptorBuilder>) VISITOR).build();
+        return ItscoIntrospector.visitMembers(itscoType, new DescriptorBuilder(), (ItscoVisitor<T, DescriptorBuilder>) VISITOR).build();
     }
 
     private static class DescriptorBuilder {
@@ -51,7 +51,7 @@ public class GnuCliItscoParser implements CliItscoParser {
         }
     }
 
-    private static final ItscoVisitor<?,DescriptorBuilder> VISITOR = new ItscoVisitor<Object,DescriptorBuilder>() {
+    private static final ItscoVisitor<?, DescriptorBuilder> VISITOR = new ItscoVisitor<Object, DescriptorBuilder>() {
         @Override
         public <T> void visitSimple(final String name, final Method method, final Class<T> propertyType, final boolean required, final DescriptorBuilder input) {
             if (Boolean.class.isAssignableFrom(propertyType)) {
@@ -63,7 +63,7 @@ public class GnuCliItscoParser implements CliItscoParser {
 
         @Override
         public <T> void visitItsco(final String name, final Method method, final Class<T> propertyType, final boolean required, final DescriptorBuilder input) {
-            input.add(name, ItscoIntrospector.visitMembers(propertyType, new DescriptorBuilder(), (ItscoVisitor<T,DescriptorBuilder>) VISITOR).build());
+            input.add(name, ItscoIntrospector.visitMembers(propertyType, new DescriptorBuilder(), (ItscoVisitor<T, DescriptorBuilder>) VISITOR).build());
         }
 
         @Override

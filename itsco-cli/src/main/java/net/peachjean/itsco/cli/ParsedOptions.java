@@ -15,18 +15,15 @@ public class ParsedOptions {
         this.backingConfig = backingConfig;
     }
 
-    boolean hasOption(String name)
-    {
+    boolean hasOption(String name) {
         return optionsDescriptor.getDetailsMap().containsKey(name) && optionsDescriptor.getDetailsMap().get(name).hasValue(commandLine, backingConfig);
     }
 
-    String getValue(String name)
-    {
+    String getValue(String name) {
         return optionsDescriptor.getDetailsMap().get(name).getValue(commandLine, backingConfig);
     }
 
-    ParsedOptions subValue(String name)
-    {
+    ParsedOptions subValue(String name) {
         return new ParsedOptions(commandLine, optionsDescriptor.getSubDescriptorMap().get(name), backingConfig.subset(name));
     }
 }

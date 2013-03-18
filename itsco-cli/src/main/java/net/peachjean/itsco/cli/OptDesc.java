@@ -12,5 +12,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Inherited
 public @interface OptDesc {
     String description() default "";
+
     String shortOpt() default "";
 }

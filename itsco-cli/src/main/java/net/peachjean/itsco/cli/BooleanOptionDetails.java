@@ -28,15 +28,13 @@ class BooleanOptionDetails implements OptionDetails {
 
     @Override
     public String getValue(final CommandLine commandLine, final Configuration backingConfig) {
-        if(commandLine.hasOption(name)) {
-            if(togglesFalse) {
+        if (commandLine.hasOption(name)) {
+            if (togglesFalse) {
                 return Boolean.toString(false);
-            }
-            else {
+            } else {
                 return Boolean.toString(true);
             }
-        }
-        else {
+        } else {
             return backingConfig.getString(name);
         }
     }

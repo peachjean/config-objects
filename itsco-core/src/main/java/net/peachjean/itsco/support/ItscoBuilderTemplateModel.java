@@ -60,7 +60,7 @@ public class ItscoBuilderTemplateModel {
         public Prop(final String name, final String type, final boolean required) {
             this.name = name;
             this.type = type;
-            this.capName = name.substring(0,1).toUpperCase() + name.substring(1);
+            this.capName = name.substring(0, 1).toUpperCase() + name.substring(1);
             this.required = required;
         }
 

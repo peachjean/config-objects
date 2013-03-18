@@ -10,7 +10,6 @@ import org.junit.Test;
 
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
-import java.io.IOException;
 
 public class ItscoAnnotationProcessorTest {
     @Rule
@@ -39,7 +38,7 @@ public class ItscoAnnotationProcessorTest {
                         .line("    }")
                         .line("  }")
                         .line("}")
-                .build(),
+                        .build(),
                 JavaSourceFromText.builder("com.example.ExampleItscoAsserter")
                         .line("package com.example;")
                         .line("import net.peachjean.tater.test.*;")
@@ -54,7 +53,7 @@ public class ItscoAnnotationProcessorTest {
                         .line("    assertionHandler.assertEquals(\"intValue\", 88, ex.getIntValue().intValue());")
                         .line("  }")
                         .line("}")
-                .build()
+                        .build()
 
         };
 

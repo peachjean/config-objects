@@ -1,21 +1,16 @@
 package net.peachjean.itsco.support;
 
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableSet;
 import net.peachjean.itsco.support.example.CompoundItsco;
 import net.peachjean.itsco.support.example.ExampleItsco;
 import org.apache.bval.jsr303.ApacheValidationProvider;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationConverter;
 import org.junit.Test;
 
 import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
 import javax.validation.Validation;
 import javax.validation.Validator;
-import java.util.Properties;
 import java.util.Set;
 
 import static org.junit.Assert.*;
@@ -23,8 +18,7 @@ import static org.junit.Assert.*;
 public class ItscoFactorySupportTest {
 
     @Test
-    public void simpleExample()
-    {
+    public void simpleExample() {
         Configuration config = new BaseConfiguration();
         config.setProperty("value1", "I am zee value!");
         config.setProperty("intValue", "88");
@@ -47,8 +41,7 @@ public class ItscoFactorySupportTest {
     }
 
     @Test
-    public void simpleValidatorPOC()
-    {
+    public void simpleValidatorPOC() {
         Configuration config = new BaseConfiguration();
         config.setProperty("value1", "I am zee value!");
         config.setProperty("intValue", "88");
@@ -72,8 +65,7 @@ public class ItscoFactorySupportTest {
     }
 
     @Test
-    public void dynamicBackerExample()
-    {
+    public void dynamicBackerExample() {
         Configuration config = new BaseConfiguration();
         config.setProperty("value1", "I am zee value!");
         config.setProperty("intValue", "88");
@@ -92,8 +84,7 @@ public class ItscoFactorySupportTest {
     }
 
     @Test
-    public void compoundItscoExample()
-    {
+    public void compoundItscoExample() {
         Configuration config = new BaseConfiguration();
         config.setProperty("subItsco.value1", "I am zee value!");
         config.setProperty("subItsco.intValue", "88");

@@ -1,10 +1,10 @@
 package net.peachjean.itsco.support;
 
-import org.apache.commons.io.Charsets;
 import net.peachjean.itsco.Itsco;
 import net.peachjean.tater.utils.TypeSourceFormatter;
 import net.peachjean.tater.utils.Utils;
 import org.apache.bval.jsr303.util.IOUtils;
+import org.apache.commons.io.Charsets;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.stringtemplate.v4.AutoIndentWriter;
 import org.stringtemplate.v4.ST;
@@ -88,8 +88,7 @@ public class ItscoAnnotationProcessor extends AbstractProcessor {
         List<ItscoBuilderTemplateModel.Prop> propList = new ArrayList<ItscoBuilderTemplateModel.Prop>();
 
         TypeElement defaultsClass = getInnerClass(serviceElement, "Defaults");
-        if(defaultsClass == null)
-        {
+        if (defaultsClass == null) {
             throw new IllegalStateException("No defaults class found.");
         }
         for (Element inner : serviceElement.getEnclosedElements()) {
@@ -101,7 +100,7 @@ public class ItscoAnnotationProcessor extends AbstractProcessor {
                     throw new IllegalStateException("Method " + methodName + " in Defaults does not override the method of the same methodName in the Itsco interface.");
                 }
 
-                final String name = methodName.substring(3,4).toLowerCase() + methodName.substring(4);
+                final String name = methodName.substring(3, 4).toLowerCase() + methodName.substring(4);
                 final String type = method.getReturnType().accept(TypeSourceFormatter.INSTANCE, Utils.from(processingEnv));
 
                 propList.add(new ItscoBuilderTemplateModel.Prop(name, type, defaultMethod == null));

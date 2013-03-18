@@ -1,13 +1,11 @@
 package net.peachjean.itsco.support;
 
-import com.google.common.base.Function;
 import net.peachjean.itsco.support.example.ExampleItsco;
 import net.peachjean.itsco.support.example.ExampleItscoImpl;
 import net.peachjean.itsco.support.example.PrimitiveItsco;
 import org.apache.commons.collections.Transformer;
 import org.easymock.EasyMock;
 import org.hamcrest.Matchers;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.easymock.EasyMock.expect;
@@ -15,8 +13,7 @@ import static org.junit.Assert.*;
 
 public class InstantiatorTest {
     @Test
-    public void testValues()
-    {
+    public void testValues() {
         ItscoBacker backer = EasyMock.createMock(ItscoBacker.class);
 
         expect(backer.lookup("intValue", Integer.class, 55)).andReturn(88);
@@ -27,7 +24,7 @@ public class InstantiatorTest {
 
         Instantiator underTest = new Instantiator();
 
-        final Transformer<ItscoBacker,ExampleItsco> generator = underTest.lookupFunction(ExampleItsco.class);
+        final Transformer<ItscoBacker, ExampleItsco> generator = underTest.lookupFunction(ExampleItsco.class);
 
         final ExampleItsco itsco1 = generator.transform(backer);
 
@@ -35,13 +32,10 @@ public class InstantiatorTest {
         assertEquals(88, itsco1.getIntValue().intValue());
         assertEquals("secondValue", itsco1.getValue2());
 
-        try
-        {
+        try {
             itsco1.getValue1();
             fail("Should have thrown an exception.");
-        }
-        catch(IllegalStateException e)
-        {
+        } catch (IllegalStateException e) {
             // expected
         }
 
@@ -49,8 +43,7 @@ public class InstantiatorTest {
     }
 
     @Test
-    public void testHashCodeAndEquals()
-    {
+    public void testHashCodeAndEquals() {
         ItscoBacker backer = EasyMock.createMock(ItscoBacker.class);
         ItscoBacker otherBacker = EasyMock.createMock(ItscoBacker.class);
 
@@ -67,7 +60,7 @@ public class InstantiatorTest {
 
         Instantiator underTest = new Instantiator();
 
-        final Transformer<ItscoBacker,ExampleItsco> generator = underTest.lookupFunction(ExampleItsco.class);
+        final Transformer<ItscoBacker, ExampleItsco> generator = underTest.lookupFunction(ExampleItsco.class);
 
         final ExampleItsco itsco1 = generator.transform(backer);
         final ExampleItsco itsco2 = generator.transform(backer);
@@ -76,17 +69,16 @@ public class InstantiatorTest {
         assertNotNull(itsco2);
 
         assertEquals(itsco1.hashCode(), itsco2.hashCode());
-        assertEquals(itsco1,  itsco2);
+        assertEquals(itsco1, itsco2);
 
         final ExampleItsco itsco3 = generator.transform(otherBacker);
 
         assertNotNull(itsco3);
-        assertThat(itsco1, Matchers.not(Matchers.equalTo(itsco3     )));
+        assertThat(itsco1, Matchers.not(Matchers.equalTo(itsco3)));
     }
 
     @Test
-    public void testToString()
-    {
+    public void testToString() {
         ItscoBacker backer = EasyMock.createMock(ItscoBacker.class);
 
         expect(backer.lookup("intValue", Integer.class, 55)).andReturn(88).anyTimes();
@@ -105,23 +97,22 @@ public class InstantiatorTest {
     }
 
     @Test
-    public void testPrimitive()
-    {
+    public void testPrimitive() {
         ItscoBacker backer = EasyMock.createMock(ItscoBacker.class);
 
         expect(backer.lookup("booleanValue", Boolean.class)).andReturn(false);
-        expect(backer.lookup("byteValue", Byte.class)).andReturn((byte)0xFE);
+        expect(backer.lookup("byteValue", Byte.class)).andReturn((byte) 0xFE);
         expect(backer.lookup("charValue", Character.class)).andReturn('x');
-        expect(backer.lookup("shortValue", Short.class)).andReturn((short)3);
+        expect(backer.lookup("shortValue", Short.class)).andReturn((short) 3);
         expect(backer.lookup("intValue", Integer.class)).andReturn(12);
         expect(backer.lookup("longValue", Long.class)).andReturn(49l);
         expect(backer.lookup("floatValue", Float.class)).andReturn(55.555f);
         expect(backer.lookup("doubleValue", Double.class)).andReturn(23.39389);
 
         expect(backer.lookup("booleanValue2", Boolean.class, PrimitiveItsco.DEFAULT_BOOLEAN)).andReturn(false);
-        expect(backer.lookup("byteValue2", Byte.class, (byte)PrimitiveItsco.DEFAULT_BYTE)).andReturn((byte)0xFE);
+        expect(backer.lookup("byteValue2", Byte.class, (byte) PrimitiveItsco.DEFAULT_BYTE)).andReturn((byte) 0xFE);
         expect(backer.lookup("charValue2", Character.class, PrimitiveItsco.DEFAULT_CHAR)).andReturn('x');
-        expect(backer.lookup("shortValue2", Short.class, (short)PrimitiveItsco.DEFAULT_SHORT)).andReturn((short)3);
+        expect(backer.lookup("shortValue2", Short.class, (short) PrimitiveItsco.DEFAULT_SHORT)).andReturn((short) 3);
         expect(backer.lookup("intValue2", Integer.class, PrimitiveItsco.DEFAULT_INT)).andReturn(12);
         expect(backer.lookup("longValue2", Long.class, PrimitiveItsco.DEFAULT_LONG)).andReturn(49l);
         expect(backer.lookup("floatValue2", Float.class, PrimitiveItsco.DEFAULT_FLOAT)).andReturn(55.555f);
@@ -136,7 +127,7 @@ public class InstantiatorTest {
         assertNotNull(generated);
 
         assertEquals(false, generated.getBooleanValue());
-        assertEquals((byte)0xFE, generated.getByteValue());
+        assertEquals((byte) 0xFE, generated.getByteValue());
         assertEquals('x', generated.getCharValue());
         assertEquals(3, generated.getShortValue());
         assertEquals(12, generated.getIntValue());
@@ -145,7 +136,7 @@ public class InstantiatorTest {
         assertEquals(23.39389, generated.getDoubleValue(), 0.000002);
 
         assertEquals(false, generated.getBooleanValue2());
-        assertEquals((byte)0xFE, generated.getByteValue2());
+        assertEquals((byte) 0xFE, generated.getByteValue2());
         assertEquals('x', generated.getCharValue2());
         assertEquals(3, generated.getShortValue2());
         assertEquals(12, generated.getIntValue2());

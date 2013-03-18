@@ -9,24 +9,20 @@ public class ValueOfResolutionStrategy implements FieldResolutionStrategy {
     public static final ValueOfResolutionStrategy INSTANCE = new ValueOfResolutionStrategy();
 
     @Override
-    public <T,C> T resolve(final String name, final Class<T> lookupType, final C context, final ContextAccessor<C> accessor) {
+    public <T, C> T resolve(final String name, final Class<T> lookupType, final C context, final ContextAccessor<C> accessor) {
 
-        if(accessor.contains(context, name))
-        {
+        if (accessor.contains(context, name)) {
             return getAndReturn(name, lookupType, context, accessor);
-        }
-        else
-        {
+        } else {
             return null;
         }
     }
 
-    private <T,C> T getAndReturn(final String name, final Class<T> lookupType, C context, ContextAccessor<C> accessor) {
+    private <T, C> T getAndReturn(final String name, final Class<T> lookupType, C context, ContextAccessor<C> accessor) {
         String value = accessor.contextLookup(context, name);
         try {
             Method m = lookupMethod(lookupType);
-            if(m == null)
-            {
+            if (m == null) {
                 throw new IllegalArgumentException("Class " + lookupType.getName() + " does not have a valueOf method.");
             }
             return lookupType.cast(m.invoke(null, value));
@@ -41,8 +37,7 @@ public class ValueOfResolutionStrategy implements FieldResolutionStrategy {
         try {
             final Method valueOf = lookupType.getMethod("valueOf", String.class);
             final int mod = valueOf.getModifiers();
-            if(!Modifier.isStatic(mod) || Modifier.isAbstract(mod) || !Modifier.isPublic(mod))
-            {
+            if (!Modifier.isStatic(mod) || Modifier.isAbstract(mod) || !Modifier.isPublic(mod)) {
                 return null;
             }
             return valueOf;

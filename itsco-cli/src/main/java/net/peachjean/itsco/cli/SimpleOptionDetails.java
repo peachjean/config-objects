@@ -2,7 +2,6 @@ package net.peachjean.itsco.cli;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
-import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.configuration.Configuration;
 
 class SimpleOptionDetails implements OptionDetails {
@@ -28,12 +27,9 @@ class SimpleOptionDetails implements OptionDetails {
 
     @Override
     public String getValue(final CommandLine commandLine, final Configuration backingConfig) {
-        if(commandLine.hasOption(name))
-        {
+        if (commandLine.hasOption(name)) {
             return commandLine.getOptionValue(name);
-        }
-        else
-        {
+        } else {
             return backingConfig.getString(name);
         }
     }

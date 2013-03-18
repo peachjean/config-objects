@@ -27,16 +27,13 @@ public class GeneratorPOC {
         STGroup stGroup = new STGroupFile(Resources.getResource(GeneratorPOC.class, "builder.stg"), Charsets.UTF_8.name(), '<', '>');
         ST typeTemplate = stGroup.getInstanceOf("builder");
 
-         typeTemplate.add("itsco", buildItscoModel());
-         Writer writer = new FileWriter(output);
-         try
-         {
-                 typeTemplate.write(new AutoIndentWriter(writer, "\n"));
-         }
-         finally
-         {
-                 Closeables.close(writer, false);
-         }
+        typeTemplate.add("itsco", buildItscoModel());
+        Writer writer = new FileWriter(output);
+        try {
+            typeTemplate.write(new AutoIndentWriter(writer, "\n"));
+        } finally {
+            Closeables.close(writer, false);
+        }
 
     }
 
@@ -47,16 +44,15 @@ public class GeneratorPOC {
                 ExampleItsco.class.getSimpleName() + "." + ExampleItsco.Defaults.class.getSimpleName(),
                 ExampleItsco.class.getPackage().getName(),
                 buildPropsList()
-                );
+        );
     }
 
     private List<ItscoBuilderTemplateModel.Prop> buildPropsList() {
         ImmutableList.Builder<ItscoBuilderTemplateModel.Prop> list = ImmutableList.builder();
 
-        for(Method m: ExampleItsco.class.getMethods())
-        {
+        for (Method m : ExampleItsco.class.getMethods()) {
             String methodName = m.getName();
-            String name = methodName.substring(3,4).toLowerCase() + methodName.substring(4);
+            String name = methodName.substring(3, 4).toLowerCase() + methodName.substring(4);
             list.add(new ItscoBuilderTemplateModel.Prop(name, m.getReturnType().getName(), isRequired(m)));
         }
         return list.build();
