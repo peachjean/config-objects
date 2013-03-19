@@ -9,38 +9,17 @@ import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.ObjectUtils;
 
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
-public class InstantiatorFactory {
-    private final Map<Class, BackedInstantiator<?>> cache = new HashMap<Class, BackedInstantiator<?>>();
-
-    @SuppressWarnings("unchecked")
-    <T> BackedInstantiator<T> lookupFunction(final Class<T> itscoInterface) {
-        if (!cache.containsKey(itscoInterface)) {
-            synchronized (cache) {
-                if (!cache.containsKey(itscoInterface)) {
-                    try {
-                        cache.put(itscoInterface, createInstantiatior(itscoInterface));
-                    } catch (NotFoundException e) {
-                        throw new RuntimeException("Could not create instantiation function for " + itscoInterface.getName(), e);
-                    } catch (CannotCompileException e) {
-                        throw new RuntimeException("Could not create instantiation function for " + itscoInterface.getName(), e);
-                    } catch (NoSuchMethodException e) {
-                        throw new RuntimeException("Could not create instantiation function for " + itscoInterface.getName(), e);
-                    }
-                }
-            }
-        }
-        return (BackedInstantiator<T>) cache.get(itscoInterface);
+class InlineImplementationGenerator implements ImplementationGenerator {
+    public InlineImplementationGenerator() {
     }
 
-    private <T> BackedInstantiator<T> createInstantiatior(final Class<T> itscoClass) throws NotFoundException, CannotCompileException, NoSuchMethodException {
-        final Class<? extends T> implClass = createImplClass(itscoClass);
-
-        return new BackedInstantiatorImpl<T>(itscoClass);
-    }
-
-    private <T> Class<? extends T> createImplClass(final Class<T> itscoClass) throws NotFoundException, CannotCompileException {
+    @Override
+    public <T> Class<? extends T> implementor(final Class<T> itscoClass) throws NotFoundException, CannotCompileException {
         return ItscoIntrospector.visitMembers(itscoClass, new CtClassBuilder<T>(itscoClass), new ItscoVisitor<T, CtClassBuilder<T>>() {
             @Override
             public void visitDefaults(final Class<? extends T> defaultsClass, final CtClassBuilder<T> input) {
@@ -243,5 +222,4 @@ public class InstantiatorFactory {
             toStringPairs.put(name, methodCall);
         }
     }
-
 }

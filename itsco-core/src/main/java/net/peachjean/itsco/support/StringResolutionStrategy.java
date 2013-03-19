@@ -2,7 +2,7 @@ package net.peachjean.itsco.support;
 
 import org.apache.commons.configuration.Configuration;
 
-public class StringResolutionStrategy implements FieldResolutionStrategy {
+class StringResolutionStrategy implements FieldResolutionStrategy {
 
     public static final StringResolutionStrategy INSTANCE = new StringResolutionStrategy();
 

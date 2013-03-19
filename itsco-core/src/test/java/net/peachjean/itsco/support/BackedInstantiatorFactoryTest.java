@@ -11,7 +11,7 @@ import static org.easymock.EasyMock.expect;
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 
-public class InstantiatorFactoryTest {
+public class BackedInstantiatorFactoryTest {
     @Test
     public void testValues() {
         ItscoBacker backer = EasyMock.createMock(ItscoBacker.class);
@@ -22,7 +22,7 @@ public class InstantiatorFactoryTest {
 
         EasyMock.replay(backer);
 
-        InstantiatorFactory underTest = new InstantiatorFactory();
+        BackedInstantiatorFactory underTest = new BackedInstantiatorFactory();
 
         final BackedInstantiator<ExampleItsco> generator = underTest.lookupFunction(ExampleItsco.class);
 
@@ -58,7 +58,7 @@ public class InstantiatorFactoryTest {
 
         EasyMock.replay(backer);
 
-        InstantiatorFactory underTest = new InstantiatorFactory();
+        BackedInstantiatorFactory underTest = new BackedInstantiatorFactory();
 
         final BackedInstantiator<ExampleItsco> generator = underTest.lookupFunction(ExampleItsco.class);
 
@@ -87,7 +87,7 @@ public class InstantiatorFactoryTest {
 
         EasyMock.replay(backer);
 
-        InstantiatorFactory underTest = new InstantiatorFactory();
+        BackedInstantiatorFactory underTest = new BackedInstantiatorFactory();
 
         final ExampleItsco generated = underTest.lookupFunction(ExampleItsco.class).instantiate(backer);
         final ExampleItsco hardCoded = new ExampleItscoImpl(backer);
@@ -120,7 +120,7 @@ public class InstantiatorFactoryTest {
 
         EasyMock.replay(backer);
 
-        InstantiatorFactory underTest = new InstantiatorFactory();
+        BackedInstantiatorFactory underTest = new BackedInstantiatorFactory();
 
         final PrimitiveItsco generated = underTest.lookupFunction(PrimitiveItsco.class).instantiate(backer);
 
@@ -154,7 +154,7 @@ public class InstantiatorFactoryTest {
 
         EasyMock.replay(backer);
 
-        InstantiatorFactory underTest = new InstantiatorFactory();
+        BackedInstantiatorFactory underTest = new BackedInstantiatorFactory();
 
 //        final DependentItsco generated = underTest.lookupFunction(DependentItsco.class, MasterItsco.class, "dependent").transform(backer);
 //

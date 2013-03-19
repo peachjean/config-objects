@@ -1,5 +1,7 @@
 package net.peachjean.itsco.support;
 
+import org.apache.commons.lang3.AnnotationUtils;
+
 import javax.inject.Qualifier;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -20,12 +22,14 @@ class BackedInstantiatorImpl<T> implements BackedInstantiator<T> {
     };
     private final Constructor<? extends T> constructor;
     private final Class<T> itscoClass;
+    private final Class<? extends T> itscoImplClass;
     private final GenericType[] bindingType;
     private final Annotation[] bindingAnnotation;
 
-    public BackedInstantiatorImpl(Class<T> itscoClass) {
+    public BackedInstantiatorImpl(Class<T> itscoClass, Class<? extends T> itscoImplClass) {
         this.itscoClass = itscoClass;
-        this.constructor = (Constructor<? extends T>) itscoClass.getConstructors()[0];
+        this.itscoImplClass = itscoImplClass;
+        this.constructor = (Constructor<? extends T>) itscoImplClass.getConstructors()[0];
 
         Type[] parameterTypes = constructor.getGenericParameterTypes();
         if (parameterTypes.length < 1 || !ItscoBacker.class.isAssignableFrom(constructor.getParameterTypes()[0])) {
@@ -38,7 +42,7 @@ class BackedInstantiatorImpl<T> implements BackedInstantiator<T> {
             bindingType[i] = GenericType.forType(parameterTypes[i]);
             Annotation[] annotations = parameterAnnotations[i];
             for (int j = 0; j < annotations.length; j++) {
-                if (annotations[j].getClass().isAnnotationPresent(Qualifier.class)) {
+                if (annotations[j].annotationType().isAnnotationPresent(Qualifier.class)) {
                     bindingAnnotation[i] = annotations[j];
                 }
             }

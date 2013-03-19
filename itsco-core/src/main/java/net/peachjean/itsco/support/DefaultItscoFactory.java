@@ -11,7 +11,7 @@ import java.util.Map;
  */
 public class DefaultItscoFactory implements ItscoFactory {
 
-    private final InstantiatorFactory instantiatorFactory = new InstantiatorFactory();
+    private final BackedInstantiatorFactory backedInstantiatorFactory = new BackedInstantiatorFactory();
     private final FieldResolutionStrategy[] strategies = {
             StringResolutionStrategy.INSTANCE,
             ValueOfResolutionStrategy.INSTANCE,
@@ -24,12 +24,12 @@ public class DefaultItscoFactory implements ItscoFactory {
 
     @Override
     public <T> T create(Configuration config, Class<T> itscoClass) {
-        return instantiatorFactory.lookupFunction(itscoClass).instantiate(createBacker(config, itscoClass));
+        return backedInstantiatorFactory.lookupFunction(itscoClass).instantiate(createBacker(config, itscoClass));
     }
 
     @Override
     public <T> T create(Configuration config, Class<T> itscoClass, InstantiationContext context) {
-        return instantiatorFactory.lookupFunction(itscoClass).instantiate(createBacker(config, itscoClass), context);
+        return backedInstantiatorFactory.lookupFunction(itscoClass).instantiate(createBacker(config, itscoClass), context);
     }
 
     @Override

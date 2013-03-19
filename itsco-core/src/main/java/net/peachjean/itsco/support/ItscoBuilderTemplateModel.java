@@ -5,7 +5,7 @@ import org.apache.commons.collections.Predicate;
 
 import java.util.List;
 
-public class ItscoBuilderTemplateModel {
+class ItscoBuilderTemplateModel {
     private final String builderName;
     private final String name;
     private final String defaultsName;

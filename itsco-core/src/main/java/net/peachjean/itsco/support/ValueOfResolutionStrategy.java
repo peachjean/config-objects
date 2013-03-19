@@ -6,7 +6,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
-public class ValueOfResolutionStrategy implements FieldResolutionStrategy {
+class ValueOfResolutionStrategy implements FieldResolutionStrategy {
 
     public static final ValueOfResolutionStrategy INSTANCE = new ValueOfResolutionStrategy();
 
