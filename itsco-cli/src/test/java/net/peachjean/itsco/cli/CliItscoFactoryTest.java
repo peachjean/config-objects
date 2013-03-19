@@ -11,7 +11,7 @@ import static org.junit.Assert.assertFalse;
 public class CliItscoFactoryTest {
     @Test
     public void testCreate() throws Exception {
-        ItscoFactory<ParsedOptions> underTest = new CliItscoFactory();
+        ItscoFactory<ParsedOptions> underTest = new CliDefaultItscoFactory();
         CliItscoParser parser = new GnuCliItscoParser();
 
         final ExampleItsco exampleItsco = underTest.create(parser.parse(ExampleItsco.class, new String[]{"-i", "88", "-v", "-q"}, new BaseConfiguration()), ExampleItsco.class);

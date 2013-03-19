@@ -3,15 +3,15 @@ package net.peachjean.itsco.support;
 import net.peachjean.itsco.support.example.ExampleItsco;
 import net.peachjean.itsco.support.example.ExampleItscoImpl;
 import net.peachjean.itsco.support.example.PrimitiveItsco;
-import org.apache.commons.collections.Transformer;
 import org.easymock.EasyMock;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
 import static org.easymock.EasyMock.expect;
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-public class InstantiatorTest {
+public class InstantiatorFactoryTest {
     @Test
     public void testValues() {
         ItscoBacker backer = EasyMock.createMock(ItscoBacker.class);
@@ -22,11 +22,11 @@ public class InstantiatorTest {
 
         EasyMock.replay(backer);
 
-        Instantiator underTest = new Instantiator();
+        InstantiatorFactory underTest = new InstantiatorFactory();
 
-        final Transformer<ItscoBacker, ExampleItsco> generator = underTest.lookupFunction(ExampleItsco.class);
+        final BackedInstantiator<ExampleItsco> generator = underTest.lookupFunction(ExampleItsco.class);
 
-        final ExampleItsco itsco1 = generator.transform(backer);
+        final ExampleItsco itsco1 = generator.instantiate(backer);
 
         assertNotNull(itsco1);
         assertEquals(88, itsco1.getIntValue().intValue());
@@ -58,12 +58,12 @@ public class InstantiatorTest {
 
         EasyMock.replay(backer);
 
-        Instantiator underTest = new Instantiator();
+        InstantiatorFactory underTest = new InstantiatorFactory();
 
-        final Transformer<ItscoBacker, ExampleItsco> generator = underTest.lookupFunction(ExampleItsco.class);
+        final BackedInstantiator<ExampleItsco> generator = underTest.lookupFunction(ExampleItsco.class);
 
-        final ExampleItsco itsco1 = generator.transform(backer);
-        final ExampleItsco itsco2 = generator.transform(backer);
+        final ExampleItsco itsco1 = generator.instantiate(backer);
+        final ExampleItsco itsco2 = generator.instantiate(backer);
 
         assertNotNull(itsco1);
         assertNotNull(itsco2);
@@ -71,7 +71,7 @@ public class InstantiatorTest {
         assertEquals(itsco1.hashCode(), itsco2.hashCode());
         assertEquals(itsco1, itsco2);
 
-        final ExampleItsco itsco3 = generator.transform(otherBacker);
+        final ExampleItsco itsco3 = generator.instantiate(otherBacker);
 
         assertNotNull(itsco3);
         assertThat(itsco1, Matchers.not(Matchers.equalTo(itsco3)));
@@ -87,9 +87,9 @@ public class InstantiatorTest {
 
         EasyMock.replay(backer);
 
-        Instantiator underTest = new Instantiator();
+        InstantiatorFactory underTest = new InstantiatorFactory();
 
-        final ExampleItsco generated = underTest.lookupFunction(ExampleItsco.class).transform(backer);
+        final ExampleItsco generated = underTest.lookupFunction(ExampleItsco.class).instantiate(backer);
         final ExampleItsco hardCoded = new ExampleItscoImpl(backer);
 
         assertNotNull(generated);
@@ -120,9 +120,9 @@ public class InstantiatorTest {
 
         EasyMock.replay(backer);
 
-        Instantiator underTest = new Instantiator();
+        InstantiatorFactory underTest = new InstantiatorFactory();
 
-        final PrimitiveItsco generated = underTest.lookupFunction(PrimitiveItsco.class).transform(backer);
+        final PrimitiveItsco generated = underTest.lookupFunction(PrimitiveItsco.class).instantiate(backer);
 
         assertNotNull(generated);
 
@@ -144,4 +144,22 @@ public class InstantiatorTest {
         assertEquals(55.555f, generated.getFloatValue2(), 0.00002);
         assertEquals(23.39389, generated.getDoubleValue2(), 0.000002);
     }
+
+    @Test
+    public void testContextualInstantiation() {
+        ItscoBacker backer = EasyMock.createMock(ItscoBacker.class);
+
+        expect(backer.lookup("shared.namespace", String.class)).andReturn("myNamespace");
+        expect(backer.lookup("shared.maxSize", Integer.class)).andReturn(67);
+
+        EasyMock.replay(backer);
+
+        InstantiatorFactory underTest = new InstantiatorFactory();
+
+//        final DependentItsco generated = underTest.lookupFunction(DependentItsco.class, MasterItsco.class, "dependent").transform(backer);
+//
+//        assertEquals("myNamespace/myFile", generated.getPath());
+    }
+
+
 }

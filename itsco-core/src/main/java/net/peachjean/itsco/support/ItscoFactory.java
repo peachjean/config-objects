@@ -1,9 +1,11 @@
 package net.peachjean.itsco.support;
 
-import org.apache.commons.collections.Transformer;
+import org.apache.commons.configuration.Configuration;
 
-public interface ItscoFactory<C> {
-    <T> T create(C context, Class<T> itscoClass);
+public interface ItscoFactory {
+    <T> T create(Configuration config, Class<T> itscoClass);
 
-    <T> Transformer<C, T> createGenerator(Class<T> itscoClass);
+    <T> T create(Configuration config, Class<T> itscoClass, InstantiationContext context);
+
+    <T> Instantiator<T> createGenerator(Class<T> itscoClass);
 }

@@ -1,8 +1,8 @@
 package net.peachjean.itsco.cli;
 
-import net.peachjean.itsco.support.ItscoFactorySupport;
+import net.peachjean.itsco.support.DefaultItscoFactory;
 
-public class CliItscoFactory extends ItscoFactorySupport<ParsedOptions> {
+public class CliDefaultItscoFactory extends DefaultItscoFactory<ParsedOptions> {
     @Override
     public boolean contains(final ParsedOptions context, final String key) {
         return context.hasOption(key);

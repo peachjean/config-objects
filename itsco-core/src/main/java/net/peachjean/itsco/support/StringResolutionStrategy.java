@@ -1,18 +1,20 @@
 package net.peachjean.itsco.support;
 
+import org.apache.commons.configuration.Configuration;
+
 public class StringResolutionStrategy implements FieldResolutionStrategy {
 
     public static final StringResolutionStrategy INSTANCE = new StringResolutionStrategy();
 
     @Override
-    public <T, C> T resolve(final String name, final Class<T> lookupType, final C context, final ContextAccessor<C> contextAccessor) {
+    public <T, C> T resolve(final String name, final Class<T> lookupType, final Configuration config) {
         if (!this.supports(lookupType)) {
             throw new IllegalArgumentException("This strategy only supports Strings.");
         }
-        if (!contextAccessor.contains(context, name)) {
+        if(!config.containsKey(name)) {
             return null;
         } else {
-            return lookupType.cast(contextAccessor.contextLookup(context, name));
+            return lookupType.cast(config.getString(name));
         }
     }
 

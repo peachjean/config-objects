@@ -1,5 +1,7 @@
 package net.peachjean.itsco.support;
 
+import org.apache.commons.configuration.Configuration;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -9,17 +11,17 @@ public class ValueOfResolutionStrategy implements FieldResolutionStrategy {
     public static final ValueOfResolutionStrategy INSTANCE = new ValueOfResolutionStrategy();
 
     @Override
-    public <T, C> T resolve(final String name, final Class<T> lookupType, final C context, final ContextAccessor<C> accessor) {
+    public <T, C> T resolve(final String name, final Class<T> lookupType, final Configuration config) {
 
-        if (accessor.contains(context, name)) {
-            return getAndReturn(name, lookupType, context, accessor);
+        if (config.containsKey(name)) {
+            return getAndReturn(name, lookupType, config);
         } else {
             return null;
         }
     }
 
-    private <T, C> T getAndReturn(final String name, final Class<T> lookupType, C context, ContextAccessor<C> accessor) {
-        String value = accessor.contextLookup(context, name);
+    private <T, C> T getAndReturn(final String name, final Class<T> lookupType, Configuration config) {
+        String value = config.getString(name);
         try {
             Method m = lookupMethod(lookupType);
             if (m == null) {

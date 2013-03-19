@@ -2,8 +2,8 @@ package net.peachjean.itsco.support;
 
 import net.peachjean.itsco.support.example.CompoundItsco;
 import net.peachjean.itsco.support.example.ExampleItsco;
+import net.peachjean.itsco.support.example.shared.MasterItsco;
 import org.apache.bval.jsr303.ApacheValidationProvider;
-import org.apache.commons.collections.Transformer;
 import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.junit.Test;
@@ -15,7 +15,7 @@ import java.util.Set;
 
 import static org.junit.Assert.*;
 
-public class ItscoFactorySupportTest {
+public class DefaultItscoFactoryTest {
 
     @Test
     public void simpleExample() {
@@ -23,7 +23,7 @@ public class ItscoFactorySupportTest {
         config.setProperty("value1", "I am zee value!");
         config.setProperty("intValue", "88");
 
-        ConfigurationItscoFactory factory = new ConfigurationItscoFactory();
+        ItscoFactory factory = new DefaultItscoFactory();
 
         ExampleItsco exampleItsco = factory.create(config, ExampleItsco.class);
 
@@ -31,9 +31,9 @@ public class ItscoFactorySupportTest {
         assertEquals("secondValue", exampleItsco.getValue2());
         assertEquals(88, exampleItsco.getIntValue().intValue());
 
-        Transformer<Configuration, ExampleItsco> generator = factory.createGenerator(ExampleItsco.class);
+        Instantiator<ExampleItsco> generator = factory.createGenerator(ExampleItsco.class);
 
-        ExampleItsco exampleItsco2 = generator.transform(config);
+        ExampleItsco exampleItsco2 = generator.instantiate(config);
 
         assertEquals("I am zee value!", exampleItsco.getValue1());
         assertEquals("secondValue", exampleItsco.getValue2());
@@ -46,7 +46,7 @@ public class ItscoFactorySupportTest {
         config.setProperty("value1", "I am zee value!");
         config.setProperty("intValue", "88");
 
-        ConfigurationItscoFactory factory = new ConfigurationItscoFactory();
+        ItscoFactory factory = new DefaultItscoFactory();
 
         ExampleItsco exampleItsco = factory.create(config, ExampleItsco.class);
 
@@ -70,7 +70,7 @@ public class ItscoFactorySupportTest {
         config.setProperty("value1", "I am zee value!");
         config.setProperty("intValue", "88");
 
-        ConfigurationItscoFactory factory = new ConfigurationItscoFactory();
+        ItscoFactory factory = new DefaultItscoFactory();
 
         ExampleItsco exampleItsco = factory.create(config, ExampleItsco.class);
 
@@ -90,7 +90,7 @@ public class ItscoFactorySupportTest {
         config.setProperty("subItsco.intValue", "88");
 
 
-        ConfigurationItscoFactory factory = new ConfigurationItscoFactory();
+        ItscoFactory factory = new DefaultItscoFactory();
 
         CompoundItsco compoundItsco = factory.create(config, CompoundItsco.class);
         ExampleItsco exampleItsco = compoundItsco.getSubItsco();
@@ -105,5 +105,19 @@ public class ItscoFactorySupportTest {
 
         assertEquals(42, exampleItsco.getIntValue().intValue());
         assertEquals(42 * 4.5f, compoundItsco.getMyFloat(), 0.0002);
+    }
+
+    @Test
+    public void sharedDependencyExample() {
+        Configuration config = new BaseConfiguration();
+        config.setProperty("shared.namespace", "myNamespace");
+        config.setProperty("shared.maxSize", "67");
+
+        ItscoFactory factory = new DefaultItscoFactory();
+        MasterItsco masterItsco = factory.create(config, MasterItsco.class);
+
+        assertEquals("myNamespace", masterItsco.getShared().getNamespace());
+        assertEquals(67, masterItsco.getShared().getMaxSize().intValue());
+        assertEquals("myNamespace/myFile", masterItsco.getDependent().getPath());
     }
 }
