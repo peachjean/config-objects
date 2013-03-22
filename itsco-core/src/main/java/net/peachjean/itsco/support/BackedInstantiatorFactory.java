@@ -6,7 +6,7 @@ import java.util.*;
 
 class BackedInstantiatorFactory {
     private final Map<Class, BackedInstantiator<?>> cache = new HashMap<Class, BackedInstantiator<?>>();
-    private final ImplementationGenerator implementationGenerator = new InlineImplementationGenerator();
+    private final ImplementationGenerator implementationGenerator = new AsmImplementationGenerator();
 
     @SuppressWarnings("unchecked")
     <T> BackedInstantiator<T> lookupFunction(final Class<T> itscoInterface) {

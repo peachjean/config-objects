@@ -9,14 +9,14 @@ import java.util.Arrays;
 import java.util.List;
 
 public class GenericType<T> {
-    private final Class<T> rawType;
+    private final Class<? extends T> rawType;
     private final List<GenericType<?>> parameters;
     private final String[] parameterNames;
 
-    public GenericType(Class<T> rawType, GenericType<?> ... parameters) {
+    public <R extends T> GenericType(Class<R> rawType, GenericType<?> ... parameters) {
         this.rawType = rawType;
         this.parameters = Arrays.asList(parameters);
-        TypeVariable<Class<T>>[] typeParameters = rawType.getTypeParameters();
+        TypeVariable<Class<R>>[] typeParameters = rawType.getTypeParameters();
         Validate.isTrue(parameters.length == typeParameters.length, "An invalid number of type parameters was supplied.");
 
         this.parameterNames = new String[typeParameters.length];
@@ -25,12 +25,40 @@ public class GenericType<T> {
         }
     }
 
-    public Class<T> getRawType() {
+    public Class<? extends T> getRawType() {
         return rawType;
     }
 
     public List<GenericType<?>> getParameters() {
         return parameters;
+    }
+
+    public Type asType() {
+        if(parameters.isEmpty()) {
+            return this.rawType;
+        } else {
+            final Type[] typeArgs = new Type[parameters.size()];
+            for(int i = 0; i < typeArgs.length; i++) {
+                typeArgs[i] = parameters.get(i).asType();
+            }
+            return new ParameterizedType() {
+
+                @Override
+                public Type[] getActualTypeArguments() {
+                    return typeArgs;
+                }
+
+                @Override
+                public Type getRawType() {
+                    return rawType;
+                }
+
+                @Override
+                public Type getOwnerType() {
+                    return null;
+                }
+            };
+        }
     }
 
     @Override

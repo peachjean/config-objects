@@ -11,7 +11,7 @@ class ValueOfResolutionStrategy implements FieldResolutionStrategy {
     public static final ValueOfResolutionStrategy INSTANCE = new ValueOfResolutionStrategy();
 
     @Override
-    public <T, C> T resolve(final String name, final Class<T> lookupType, final Configuration config) {
+    public <T, C> T resolve(final String name, final Class<T> lookupType, final Configuration config, final C resolutionContext) {
 
         if (config.containsKey(name)) {
             return getAndReturn(name, lookupType, config);

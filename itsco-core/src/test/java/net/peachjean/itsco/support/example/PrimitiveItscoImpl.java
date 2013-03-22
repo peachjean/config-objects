@@ -3,10 +3,11 @@ package net.peachjean.itsco.support.example;
 import net.peachjean.itsco.support.ItscoBacker;
 
 public class PrimitiveItscoImpl extends PrimitiveItsco.Defaults implements PrimitiveItsco {
-    private final ItscoBacker backer;
+    private final ItscoBacker<PrimitiveItsco> backer;
 
-    public PrimitiveItscoImpl(ItscoBacker backer) {
+    public PrimitiveItscoImpl(ItscoBacker<PrimitiveItsco> backer) {
         this.backer = backer;
+        backer.setContaining(this);
     }
 
     @Override

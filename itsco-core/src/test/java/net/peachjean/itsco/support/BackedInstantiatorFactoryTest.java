@@ -7,6 +7,7 @@ import org.easymock.EasyMock;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
+import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
@@ -15,6 +16,9 @@ public class BackedInstantiatorFactoryTest {
     @Test
     public void testValues() {
         ItscoBacker backer = EasyMock.createMock(ItscoBacker.class);
+
+        backer.setContaining(anyObject(ExampleItsco.class));
+        EasyMock.expectLastCall().anyTimes();
 
         expect(backer.lookup("intValue", Integer.class, 55)).andReturn(88);
         expect(backer.lookup("value2", String.class, "secondValue")).andReturn("secondValue");
@@ -46,6 +50,11 @@ public class BackedInstantiatorFactoryTest {
     public void testHashCodeAndEquals() {
         ItscoBacker backer = EasyMock.createMock(ItscoBacker.class);
         ItscoBacker otherBacker = EasyMock.createMock(ItscoBacker.class);
+
+        backer.setContaining(anyObject(ExampleItsco.class));
+        EasyMock.expectLastCall().anyTimes();
+        otherBacker.setContaining(anyObject(ExampleItsco.class));
+        EasyMock.expectLastCall().anyTimes();
 
         expect(backer.lookup("intValue", Integer.class, 55)).andReturn(88).anyTimes();
         expect(backer.lookup("value2", String.class, "secondValue")).andReturn("secondValue").anyTimes();
@@ -81,6 +90,9 @@ public class BackedInstantiatorFactoryTest {
     public void testToString() {
         ItscoBacker backer = EasyMock.createMock(ItscoBacker.class);
 
+        backer.setContaining(anyObject(ExampleItsco.class));
+        EasyMock.expectLastCall().anyTimes();
+
         expect(backer.lookup("intValue", Integer.class, 55)).andReturn(88).anyTimes();
         expect(backer.lookup("value2", String.class, "secondValue")).andReturn("secondValue").anyTimes();
         expect(backer.lookup("value1", String.class)).andReturn("woohoo!").anyTimes();
@@ -99,6 +111,9 @@ public class BackedInstantiatorFactoryTest {
     @Test
     public void testPrimitive() {
         ItscoBacker backer = EasyMock.createMock(ItscoBacker.class);
+
+        backer.setContaining(anyObject(PrimitiveItsco.class));
+        EasyMock.expectLastCall().anyTimes();
 
         expect(backer.lookup("booleanValue", Boolean.class)).andReturn(false);
         expect(backer.lookup("byteValue", Byte.class)).andReturn((byte) 0xFE);

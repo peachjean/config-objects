@@ -3,6 +3,9 @@ package net.peachjean.itsco.support;
 import net.peachjean.itsco.support.example.CompoundItsco;
 import net.peachjean.itsco.support.example.ExampleItsco;
 import net.peachjean.itsco.support.example.PrimitiveItsco;
+import net.peachjean.itsco.support.example.shared.DependentItsco;
+import net.peachjean.itsco.support.example.shared.MasterItsco;
+import net.peachjean.itsco.support.example.shared.SharedItsco;
 import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.easymock.EasyMock;
@@ -11,6 +14,7 @@ import org.junit.Test;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
+import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -20,6 +24,9 @@ public abstract class AbstractImplementationGeneratorTest {
     @Test
     public void testImplement() throws Exception {
         ItscoBacker mockBacker = EasyMock.createMock(ItscoBacker.class);
+
+        mockBacker.setContaining(anyObject(ExampleItsco.class));
+        EasyMock.expectLastCall().anyTimes();
 
         EasyMock.expect(mockBacker.lookup("intValue", Integer.class, 55)).andReturn(42).anyTimes();
         EasyMock.expect(mockBacker.lookup("value1", String.class)).andReturn("myFirstValue").anyTimes();
@@ -42,6 +49,9 @@ public abstract class AbstractImplementationGeneratorTest {
     @Test
     public void testPrimitives() throws Exception {
         ItscoBacker mockBacker = EasyMock.createMock(ItscoBacker.class);
+
+        mockBacker.setContaining(anyObject(PrimitiveItsco.class));
+        EasyMock.expectLastCall().anyTimes();
 
         expect(mockBacker.lookup("booleanValue", Boolean.class)).andReturn(false);
         expect(mockBacker.lookup("byteValue", Byte.class)).andReturn((byte) 0xFE);
@@ -97,6 +107,9 @@ public abstract class AbstractImplementationGeneratorTest {
         ItscoBacker mockBacker = EasyMock.createMock(ItscoBacker.class);
         ExampleItsco mockSub = EasyMock.createMock(ExampleItsco.class);
 
+        mockBacker.setContaining(anyObject(CompoundItsco.class));
+        EasyMock.expectLastCall().anyTimes();
+
         expect(mockSub.getIntValue()).andReturn(88).anyTimes();
         expect(mockSub.getValue2()).andReturn("secondValue").anyTimes();
 
@@ -130,6 +143,33 @@ public abstract class AbstractImplementationGeneratorTest {
 
         EasyMock.verify(mockBacker, mockSub);
     }
+
+    @Test
+    public void sharedDependencyExample() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        ItscoBacker mockBacker = EasyMock.createMock(ItscoBacker.class);
+        SharedItsco mockShared = EasyMock.createMock(SharedItsco.class);
+
+        mockBacker.setContaining(anyObject(DependentItsco.class));
+        EasyMock.expectLastCall().anyTimes();
+
+        expect(mockBacker.lookup("path", String.class, "myNamespace/myFile")).andReturn("franklin!");
+        expect(mockShared.getNamespace()).andReturn("myNamespace").anyTimes();
+        expect(mockShared.getMaxSize()).andReturn(67).anyTimes();
+
+        EasyMock.replay(mockBacker, mockShared);
+
+        ImplementationGenerator underTest = this.createUUT();
+
+        Class<? extends DependentItsco> implClass = underTest.implement(DependentItsco.class);
+        Constructor<? extends DependentItsco> constructor = implClass.getConstructor(ItscoBacker.class, SharedItsco.class );
+
+        DependentItsco dependentItsco = constructor.newInstance(mockBacker, mockShared);
+
+        assertEquals("franklin!", dependentItsco.getPath());
+
+        EasyMock.verify(mockBacker, mockShared);
+    }
+
 
 
     protected abstract ImplementationGenerator createUUT();

@@ -138,6 +138,9 @@ public class AsmImplementationGenerator implements ImplementationGenerator {
             mv.visitVarInsn(ALOAD, 0);
             mv.visitVarInsn(ALOAD, 1);
             mv.visitFieldInsn(PUTFIELD, generateAsmImplName(), "backer", BACKER_TYPE.getDescriptor());
+            mv.visitVarInsn(ALOAD, 1);
+            mv.visitVarInsn(ALOAD, 0);
+            mv.visitMethodInsn(INVOKEINTERFACE, BACKER_TYPE.getInternalName(), "setContaining", "(Ljava/lang/Object;)V");
 
             mv.visitInsn(RETURN);
             mv.visitMaxs(0, 0);

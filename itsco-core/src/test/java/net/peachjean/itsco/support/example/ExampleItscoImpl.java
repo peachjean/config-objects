@@ -5,10 +5,11 @@ import net.peachjean.itsco.support.ItscoBacker;
 
 public class ExampleItscoImpl extends ExampleItsco.Defaults implements ExampleItsco {
 
-    private final ItscoBacker backer;
+    private final ItscoBacker<ExampleItsco> backer;
 
-    public ExampleItscoImpl(final ItscoBacker backer) {
+    public ExampleItscoImpl(final ItscoBacker<ExampleItsco> backer) {
         this.backer = backer;
+        backer.setContaining(this);
     }
 
     public String getValue1() {
