@@ -29,7 +29,7 @@ class BackedInstantiatorFactory {
     }
 
     private <T> BackedInstantiator<T> createInstantiatior(final Class<T> itscoClass) throws NotFoundException, CannotCompileException, NoSuchMethodException {
-        final Class<? extends T> implClass = implementationGenerator.implementor(itscoClass);
+        final Class<? extends T> implClass = implementationGenerator.implement(itscoClass);
 
         return new BackedInstantiatorImpl<T>(itscoClass, implClass);
     }

@@ -1,8 +1,15 @@
 package net.peachjean.itsco.support;
 
-import javassist.CannotCompileException;
-import javassist.NotFoundException;
-
 interface ImplementationGenerator {
-    <T> Class<? extends T> implementor(Class<T> itscoClass) throws NotFoundException, CannotCompileException;
+    <T> Class<? extends T> implement(Class<T> itscoClass) throws ImplementationException;
+
+    class ImplementationException extends RuntimeException {
+        public ImplementationException(String message) {
+            super(message);
+        }
+
+        public ImplementationException(String message, Throwable cause) {
+            super(message, cause);
+        }
+    }
 }

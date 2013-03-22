@@ -19,7 +19,7 @@ class InlineImplementationGenerator implements ImplementationGenerator {
     }
 
     @Override
-    public <T> Class<? extends T> implementor(final Class<T> itscoClass) throws NotFoundException, CannotCompileException {
+    public <T> Class<? extends T> implement(final Class<T> itscoClass) {
         return ItscoIntrospector.visitMembers(itscoClass, new CtClassBuilder<T>(itscoClass), new ItscoVisitor<T, CtClassBuilder<T>>() {
             @Override
             public void visitDefaults(final Class<? extends T> defaultsClass, final CtClassBuilder<T> input) {

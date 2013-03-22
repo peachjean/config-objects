@@ -1,0 +1,33 @@
+methodBody(field) ::= <<
+  {
+    return ((<field.type>) this.backer.lookup("<field.name>", <field.type>.class<if(field.required)>, super.<field.methodName>()<endif>))<if(field.primitive)>.<field.primitiveType>Value()<endif>;
+  }
+>>
+
+hashCodeBody(fields) ::= <<
+  int result = 0;
+  <fields:{f|result = 31 * result + org.apache.commons.lang3.ObjectUtils.hashCode(this.<f.methodName>());}; separator="\n">
+  return result;
+>>
+
+equalsBody(itsco,fields) ::= <<
+  if(this == 0) return true;
+  if(!($1 instanceof <itsco.type>)) return false;
+
+  <itsco.type> that = (<itsco.type>) $1;
+  <fields:{f|if(!org.apache.commons.lang3.ObjectUtils.equals(this.<f.methodName>(), that.<f.methodName>())) return false;}; separator="\n">
+  return true;
+>>
+
+toStringBody(itsco,fields) ::= <<
+  return "<itsco.type>{" +
+  <fields:{f|"<f.name>='" + this.<f.methodName>() + "'" + }; separator="\n">
+  "}";
+>>
+
+constructorBody(args) ::= <<
+  {
+    super(<args:{arg|$arg}; separator=",">);
+    this.backer = $1;
+  }
+>>
