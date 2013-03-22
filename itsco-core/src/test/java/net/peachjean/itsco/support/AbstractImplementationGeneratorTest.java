@@ -1,15 +1,20 @@
 package net.peachjean.itsco.support;
 
+import net.peachjean.itsco.support.example.CompoundItsco;
 import net.peachjean.itsco.support.example.ExampleItsco;
 import net.peachjean.itsco.support.example.PrimitiveItsco;
+import org.apache.commons.configuration.BaseConfiguration;
+import org.apache.commons.configuration.Configuration;
 import org.easymock.EasyMock;
 import org.junit.Test;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 import static org.easymock.EasyMock.expect;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
 
 public abstract class AbstractImplementationGeneratorTest {
     @Test
@@ -86,6 +91,46 @@ public abstract class AbstractImplementationGeneratorTest {
         assertEquals(23.39389, impl.getDoubleValue2(), 0.000002);
 
     }
+
+    @Test
+    public void compoundItscoExample() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        ItscoBacker mockBacker = EasyMock.createMock(ItscoBacker.class);
+        ExampleItsco mockSub = EasyMock.createMock(ExampleItsco.class);
+
+        expect(mockSub.getIntValue()).andReturn(88).anyTimes();
+        expect(mockSub.getValue2()).andReturn("secondValue").anyTimes();
+
+        expect(mockBacker.lookup("subItsco", ExampleItsco.class)).andReturn(mockSub).anyTimes();
+//        expect(mockBacker.lookup("subItsco.value1", String.class)).andReturn("I am zee value!").anyTimes();
+//        expect(mockBacker.lookup("subItsco.value2", String.class, "secondValue")).andReturn("secondValue").anyTimes();
+//        expect(mockBacker.lookup("subItsco.intValue", Integer.class, 88)).andReturn(88).anyTimes();
+        expect(mockBacker.lookup("myString", String.class, "secondValue")).andReturn("secondValue").anyTimes();
+        expect(mockBacker.lookup("myFloat", Float.class, 88 * 4.5f)).andReturn(88 * 4.5f).anyTimes();
+
+        EasyMock.replay(mockBacker, mockSub);
+
+        ImplementationGenerator underTest = this.createUUT();
+
+        Class<? extends CompoundItsco> implClass = underTest.implement(CompoundItsco.class);
+        Constructor<? extends CompoundItsco> constructor = implClass.getConstructor(ItscoBacker.class);
+
+        CompoundItsco compoundItsco =  constructor.newInstance(mockBacker);
+
+//        assertEquals("I am zee value!", exampleItsco.getValue1());
+//        assertEquals("secondValue", exampleItsco.getValue2());
+//        assertEquals(88, exampleItsco.getIntValue().intValue());
+        assertSame(mockSub, compoundItsco.getSubItsco());
+        assertEquals("secondValue", compoundItsco.getMyString());
+        assertEquals(88 * 4.5f, compoundItsco.getMyFloat(), 0.0002);
+
+//        config.setProperty("subItsco.intValue", "42");
+//
+//        assertEquals(42, exampleItsco.getIntValue().intValue());
+//        assertEquals(42 * 4.5f, compoundItsco.getMyFloat(), 0.0002);
+
+        EasyMock.verify(mockBacker, mockSub);
+    }
+
 
     protected abstract ImplementationGenerator createUUT();
 }

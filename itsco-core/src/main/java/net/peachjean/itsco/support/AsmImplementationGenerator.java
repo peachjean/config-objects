@@ -221,7 +221,7 @@ public class AsmImplementationGenerator implements ImplementationGenerator {
 
         @Override
         public <P> void visitItsco(String name, Method method, Class<P> propertyType, boolean required, ItscoModel<T> input) {
-            //To change body of implemented methods use File | Settings | File Templates.
+            input.fields.add(new FieldModel(method.getName(), propertyType, name, required));
         }
 
         @Override
