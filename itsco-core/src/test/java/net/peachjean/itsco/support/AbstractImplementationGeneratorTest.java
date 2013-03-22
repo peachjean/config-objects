@@ -44,6 +44,11 @@ public abstract class AbstractImplementationGeneratorTest {
         assertEquals(42, impl.getIntValue().intValue());
         assertEquals("myFirstValue", impl.getValue1());
         assertEquals("mySecondValue", impl.getValue2());
+
+        ExampleItsco other = constructor.newInstance(mockBacker);
+        assertEquals(impl, other);
+        assertEquals("hashCodes", impl.hashCode(), other.hashCode());
+        assertEquals("toString", impl.toString(), other.toString());
     }
 
     @Test
@@ -100,6 +105,10 @@ public abstract class AbstractImplementationGeneratorTest {
         assertEquals(55.555f, impl.getFloatValue2(), 0.00002);
         assertEquals(23.39389, impl.getDoubleValue2(), 0.000002);
 
+        PrimitiveItsco other = constructor.newInstance(mockBacker);
+        assertEquals(impl, other);
+        assertEquals("hashCodes", impl.hashCode(), other.hashCode());
+        assertEquals("toString", impl.toString(), other.toString());
     }
 
     @Test
@@ -127,19 +136,24 @@ public abstract class AbstractImplementationGeneratorTest {
         Class<? extends CompoundItsco> implClass = underTest.implement(CompoundItsco.class);
         Constructor<? extends CompoundItsco> constructor = implClass.getConstructor(ItscoBacker.class);
 
-        CompoundItsco compoundItsco =  constructor.newInstance(mockBacker);
+        CompoundItsco impl =  constructor.newInstance(mockBacker);
 
 //        assertEquals("I am zee value!", exampleItsco.getValue1());
 //        assertEquals("secondValue", exampleItsco.getValue2());
 //        assertEquals(88, exampleItsco.getIntValue().intValue());
-        assertSame(mockSub, compoundItsco.getSubItsco());
-        assertEquals("secondValue", compoundItsco.getMyString());
-        assertEquals(88 * 4.5f, compoundItsco.getMyFloat(), 0.0002);
+        assertSame(mockSub, impl.getSubItsco());
+        assertEquals("secondValue", impl.getMyString());
+        assertEquals(88 * 4.5f, impl.getMyFloat(), 0.0002);
 
 //        config.setProperty("subItsco.intValue", "42");
 //
 //        assertEquals(42, exampleItsco.getIntValue().intValue());
-//        assertEquals(42 * 4.5f, compoundItsco.getMyFloat(), 0.0002);
+//        assertEquals(42 * 4.5f, impl.getMyFloat(), 0.0002);
+
+        CompoundItsco other = constructor.newInstance(mockBacker);
+        assertEquals(impl, other);
+        assertEquals("hashCodes", impl.hashCode(), other.hashCode());
+        assertEquals("toString", impl.toString(), other.toString());
 
         EasyMock.verify(mockBacker, mockSub);
     }
@@ -163,9 +177,14 @@ public abstract class AbstractImplementationGeneratorTest {
         Class<? extends DependentItsco> implClass = underTest.implement(DependentItsco.class);
         Constructor<? extends DependentItsco> constructor = implClass.getConstructor(ItscoBacker.class, SharedItsco.class );
 
-        DependentItsco dependentItsco = constructor.newInstance(mockBacker, mockShared);
+        DependentItsco impl = constructor.newInstance(mockBacker, mockShared);
 
-        assertEquals("franklin!", dependentItsco.getPath());
+        assertEquals("franklin!", impl.getPath());
+
+        DependentItsco other = constructor.newInstance(mockBacker);
+        assertEquals(impl, other);
+        assertEquals("hashCodes", impl.hashCode(), other.hashCode());
+        assertEquals("toString", impl.toString(), other.toString());
 
         EasyMock.verify(mockBacker, mockShared);
     }
