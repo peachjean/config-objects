@@ -6,4 +6,6 @@ public interface Instantiator<T> {
     T instantiate(Configuration configuration);
 
     T instantiate(Configuration configuration, InstantiationContext context);
+
+    T instantiate(Configuration configuration, Object context);
 }

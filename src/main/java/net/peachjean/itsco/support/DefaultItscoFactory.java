@@ -39,6 +39,11 @@ public class DefaultItscoFactory implements ItscoFactory {
     }
 
     @Override
+    public <T> T create(Configuration config, Class<T> itscoClass, Object context) {
+        return create(config, itscoClass, new ObjectContext(context));
+    }
+
+    @Override
     public <T> Instantiator<T> createGenerator(final Class<T> itscoClass) {
         return (Instantiator<T>) instantiatorCache.get(itscoClass);
     }
@@ -59,6 +64,11 @@ public class DefaultItscoFactory implements ItscoFactory {
             @Override
             public T instantiate(Configuration configuration, InstantiationContext context) {
                 return instantiatior.instantiate(createBacker(configuration), context);
+            }
+
+            @Override
+            public T instantiate(Configuration configuration, Object context) {
+                return this.instantiate(configuration, new ObjectContext(context));
             }
 
             private <T> ItscoBacker createBacker(final Configuration context) {

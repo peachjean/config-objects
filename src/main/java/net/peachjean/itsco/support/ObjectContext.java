@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ObjectContext implements InstantiationContext {
+class ObjectContext implements InstantiationContext {
     private final Object resolutionContext;
     private final Map<Binding<?>, Method> bindingMethodMap = new HashMap<Binding<?>, Method>();
     private final Map<Binding<?>, List<Method>> duplicatedBindingMethods = new HashMap<Binding<?>, List<Method>>();

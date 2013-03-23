@@ -7,5 +7,7 @@ public interface ItscoFactory {
 
     <T> T create(Configuration config, Class<T> itscoClass, InstantiationContext context);
 
+    <T> T create(Configuration config, Class<T> itscoClass, Object context);
+
     <T> Instantiator<T> createGenerator(Class<T> itscoClass);
 }
