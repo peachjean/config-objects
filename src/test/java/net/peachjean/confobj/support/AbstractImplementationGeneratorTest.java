@@ -1,10 +1,10 @@
 package net.peachjean.confobj.support;
 
-import net.peachjean.confobj.support.example.CompoundItsco;
-import net.peachjean.confobj.support.example.ExampleItsco;
-import net.peachjean.confobj.support.example.PrimitiveItsco;
-import net.peachjean.confobj.support.example.shared.DependentItsco;
-import net.peachjean.confobj.support.example.shared.SharedItsco;
+import net.peachjean.confobj.support.example.CompoundConfigObject;
+import net.peachjean.confobj.support.example.ExampleConfigObject;
+import net.peachjean.confobj.support.example.PrimitiveConfigObject;
+import net.peachjean.confobj.support.example.shared.DependentConfigObject;
+import net.peachjean.confobj.support.example.shared.SharedConfigObject;
 import org.easymock.EasyMock;
 import org.junit.Test;
 
@@ -22,7 +22,7 @@ public abstract class AbstractImplementationGeneratorTest {
     public void testImplement() throws Exception {
         ConfigObjectBacker mockBacker = EasyMock.createMock(ConfigObjectBacker.class);
 
-        mockBacker.setContaining(anyObject(ExampleItsco.class));
+        mockBacker.setContaining(anyObject(ExampleConfigObject.class));
         EasyMock.expectLastCall().anyTimes();
 
         EasyMock.expect(mockBacker.lookup("intValue", Integer.class, 55)).andReturn(42).anyTimes();
@@ -33,16 +33,16 @@ public abstract class AbstractImplementationGeneratorTest {
 
         ImplementationGenerator underTest = createUUT();
 
-        final Class<? extends ExampleItsco> implClass = underTest.implement(ExampleItsco.class);
-        Constructor<? extends ExampleItsco> constructor = implClass.getConstructor(ConfigObjectBacker.class);
+        final Class<? extends ExampleConfigObject> implClass = underTest.implement(ExampleConfigObject.class);
+        Constructor<? extends ExampleConfigObject> constructor = implClass.getConstructor(ConfigObjectBacker.class);
 
-        ExampleItsco impl = constructor.newInstance(mockBacker);
+        ExampleConfigObject impl = constructor.newInstance(mockBacker);
 
         assertEquals(42, impl.getIntValue().intValue());
         assertEquals("myFirstValue", impl.getValue1());
         assertEquals("mySecondValue", impl.getValue2());
 
-        ExampleItsco other = constructor.newInstance(mockBacker);
+        ExampleConfigObject other = constructor.newInstance(mockBacker);
         assertEquals(impl, other);
         assertEquals("hashCodes", impl.hashCode(), other.hashCode());
         assertEquals("toString", impl.toString(), other.toString());
@@ -52,7 +52,7 @@ public abstract class AbstractImplementationGeneratorTest {
     public void testPrimitives() throws Exception {
         ConfigObjectBacker mockBacker = EasyMock.createMock(ConfigObjectBacker.class);
 
-        mockBacker.setContaining(anyObject(PrimitiveItsco.class));
+        mockBacker.setContaining(anyObject(PrimitiveConfigObject.class));
         EasyMock.expectLastCall().anyTimes();
 
         expect(mockBacker.lookup("booleanValue", Boolean.class)).andReturn(false).anyTimes();
@@ -64,23 +64,23 @@ public abstract class AbstractImplementationGeneratorTest {
         expect(mockBacker.lookup("floatValue", Float.class)).andReturn(55.555f).anyTimes();
         expect(mockBacker.lookup("doubleValue", Double.class)).andReturn(23.39389).anyTimes();
 
-        expect(mockBacker.lookup("booleanValue2", Boolean.class, PrimitiveItsco.DEFAULT_BOOLEAN)).andReturn(false).anyTimes();
-        expect(mockBacker.lookup("byteValue2", Byte.class, (byte) PrimitiveItsco.DEFAULT_BYTE)).andReturn((byte) 0xFE).anyTimes();
-        expect(mockBacker.lookup("charValue2", Character.class, PrimitiveItsco.DEFAULT_CHAR)).andReturn('x').anyTimes();
-        expect(mockBacker.lookup("shortValue2", Short.class, (short) PrimitiveItsco.DEFAULT_SHORT)).andReturn((short) 3).anyTimes();
-        expect(mockBacker.lookup("intValue2", Integer.class, PrimitiveItsco.DEFAULT_INT)).andReturn(12).anyTimes();
-        expect(mockBacker.lookup("longValue2", Long.class, PrimitiveItsco.DEFAULT_LONG)).andReturn(49l).anyTimes();
-        expect(mockBacker.lookup("floatValue2", Float.class, PrimitiveItsco.DEFAULT_FLOAT)).andReturn(55.555f).anyTimes();
-        expect(mockBacker.lookup("doubleValue2", Double.class, PrimitiveItsco.DEFAULT_DOUBLE)).andReturn(23.39389).anyTimes();
+        expect(mockBacker.lookup("booleanValue2", Boolean.class, PrimitiveConfigObject.DEFAULT_BOOLEAN)).andReturn(false).anyTimes();
+        expect(mockBacker.lookup("byteValue2", Byte.class, (byte) PrimitiveConfigObject.DEFAULT_BYTE)).andReturn((byte) 0xFE).anyTimes();
+        expect(mockBacker.lookup("charValue2", Character.class, PrimitiveConfigObject.DEFAULT_CHAR)).andReturn('x').anyTimes();
+        expect(mockBacker.lookup("shortValue2", Short.class, (short) PrimitiveConfigObject.DEFAULT_SHORT)).andReturn((short) 3).anyTimes();
+        expect(mockBacker.lookup("intValue2", Integer.class, PrimitiveConfigObject.DEFAULT_INT)).andReturn(12).anyTimes();
+        expect(mockBacker.lookup("longValue2", Long.class, PrimitiveConfigObject.DEFAULT_LONG)).andReturn(49l).anyTimes();
+        expect(mockBacker.lookup("floatValue2", Float.class, PrimitiveConfigObject.DEFAULT_FLOAT)).andReturn(55.555f).anyTimes();
+        expect(mockBacker.lookup("doubleValue2", Double.class, PrimitiveConfigObject.DEFAULT_DOUBLE)).andReturn(23.39389).anyTimes();
 
         EasyMock.replay(mockBacker);
 
         ImplementationGenerator underTest = createUUT();
 
-        final Class<? extends PrimitiveItsco> implClass = underTest.implement(PrimitiveItsco.class);
-        Constructor<? extends PrimitiveItsco> constructor = implClass.getConstructor(ConfigObjectBacker.class);
+        final Class<? extends PrimitiveConfigObject> implClass = underTest.implement(PrimitiveConfigObject.class);
+        Constructor<? extends PrimitiveConfigObject> constructor = implClass.getConstructor(ConfigObjectBacker.class);
 
-        PrimitiveItsco impl = constructor.newInstance(mockBacker);
+        PrimitiveConfigObject impl = constructor.newInstance(mockBacker);
 
         assertNotNull(impl);
 
@@ -102,27 +102,27 @@ public abstract class AbstractImplementationGeneratorTest {
         assertEquals(55.555f, impl.getFloatValue2(), 0.00002);
         assertEquals(23.39389, impl.getDoubleValue2(), 0.000002);
 //
-        PrimitiveItsco other = constructor.newInstance(mockBacker);
+        PrimitiveConfigObject other = constructor.newInstance(mockBacker);
         assertEquals(impl, other);
         assertEquals("hashCodes", impl.hashCode(), other.hashCode());
         assertEquals("toString", impl.toString(), other.toString());
     }
 
     @Test
-    public void compoundItscoExample() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+    public void compoundConfigObjectExample() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         ConfigObjectBacker mockBacker = EasyMock.createMock(ConfigObjectBacker.class);
-        ExampleItsco mockSub = EasyMock.createMock(ExampleItsco.class);
+        ExampleConfigObject mockSub = EasyMock.createMock(ExampleConfigObject.class);
 
-        mockBacker.setContaining(anyObject(CompoundItsco.class));
+        mockBacker.setContaining(anyObject(CompoundConfigObject.class));
         EasyMock.expectLastCall().anyTimes();
 
         expect(mockSub.getIntValue()).andReturn(88).anyTimes();
         expect(mockSub.getValue2()).andReturn("secondValue").anyTimes();
 
-        expect(mockBacker.lookup("subItsco", ExampleItsco.class)).andReturn(mockSub).anyTimes();
-//        expect(mockBacker.lookup("subItsco.value1", String.class)).andReturn("I am zee value!").anyTimes();
-//        expect(mockBacker.lookup("subItsco.value2", String.class, "secondValue")).andReturn("secondValue").anyTimes();
-//        expect(mockBacker.lookup("subItsco.intValue", Integer.class, 88)).andReturn(88).anyTimes();
+        expect(mockBacker.lookup("subConfigObject", ExampleConfigObject.class)).andReturn(mockSub).anyTimes();
+//        expect(mockBacker.lookup("subConfigObject.value1", String.class)).andReturn("I am zee value!").anyTimes();
+//        expect(mockBacker.lookup("subConfigObject.value2", String.class, "secondValue")).andReturn("secondValue").anyTimes();
+//        expect(mockBacker.lookup("subConfigObject.intValue", Integer.class, 88)).andReturn(88).anyTimes();
         expect(mockBacker.lookup("myString", String.class, "secondValue")).andReturn("secondValue").anyTimes();
         expect(mockBacker.lookup("myFloat", Float.class, 88 * 4.5f)).andReturn(88 * 4.5f).anyTimes();
 
@@ -130,24 +130,24 @@ public abstract class AbstractImplementationGeneratorTest {
 
         ImplementationGenerator underTest = this.createUUT();
 
-        Class<? extends CompoundItsco> implClass = underTest.implement(CompoundItsco.class);
-        Constructor<? extends CompoundItsco> constructor = implClass.getConstructor(ConfigObjectBacker.class);
+        Class<? extends CompoundConfigObject> implClass = underTest.implement(CompoundConfigObject.class);
+        Constructor<? extends CompoundConfigObject> constructor = implClass.getConstructor(ConfigObjectBacker.class);
 
-        CompoundItsco impl =  constructor.newInstance(mockBacker);
+        CompoundConfigObject impl =  constructor.newInstance(mockBacker);
 
-//        assertEquals("I am zee value!", exampleItsco.getValue1());
-//        assertEquals("secondValue", exampleItsco.getValue2());
-//        assertEquals(88, exampleItsco.getIntValue().intValue());
-        assertSame(mockSub, impl.getSubItsco());
+//        assertEquals("I am zee value!", exampleConfigObject.getValue1());
+//        assertEquals("secondValue", exampleConfigObject.getValue2());
+//        assertEquals(88, exampleConfigObject.getIntValue().intValue());
+        assertSame(mockSub, impl.getSubConfigObject());
         assertEquals("secondValue", impl.getMyString());
         assertEquals(88 * 4.5f, impl.getMyFloat(), 0.0002);
 
-//        config.setProperty("subItsco.intValue", "42");
+//        config.setProperty("subConfigObject.intValue", "42");
 //
-//        assertEquals(42, exampleItsco.getIntValue().intValue());
+//        assertEquals(42, exampleConfigObject.getIntValue().intValue());
 //        assertEquals(42 * 4.5f, impl.getMyFloat(), 0.0002);
 
-        CompoundItsco other = constructor.newInstance(mockBacker);
+        CompoundConfigObject other = constructor.newInstance(mockBacker);
         assertEquals(impl, other);
         assertEquals("hashCodes", impl.hashCode(), other.hashCode());
         assertEquals("toString", impl.toString(), other.toString());
@@ -158,9 +158,9 @@ public abstract class AbstractImplementationGeneratorTest {
     @Test
     public void sharedDependencyExample() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         ConfigObjectBacker mockBacker = EasyMock.createMock(ConfigObjectBacker.class);
-        SharedItsco mockShared = EasyMock.createMock(SharedItsco.class);
+        SharedConfigObject mockShared = EasyMock.createMock(SharedConfigObject.class);
 
-        mockBacker.setContaining(anyObject(DependentItsco.class));
+        mockBacker.setContaining(anyObject(DependentConfigObject.class));
         EasyMock.expectLastCall().anyTimes();
 
         expect(mockBacker.lookup("path", String.class, "myNamespace/myFile")).andReturn("franklin!").anyTimes();
@@ -171,14 +171,14 @@ public abstract class AbstractImplementationGeneratorTest {
 
         ImplementationGenerator underTest = this.createUUT();
 
-        Class<? extends DependentItsco> implClass = underTest.implement(DependentItsco.class);
-        Constructor<? extends DependentItsco> constructor = implClass.getConstructor(ConfigObjectBacker.class, SharedItsco.class );
+        Class<? extends DependentConfigObject> implClass = underTest.implement(DependentConfigObject.class);
+        Constructor<? extends DependentConfigObject> constructor = implClass.getConstructor(ConfigObjectBacker.class, SharedConfigObject.class );
 
-        DependentItsco impl = constructor.newInstance(mockBacker, mockShared);
+        DependentConfigObject impl = constructor.newInstance(mockBacker, mockShared);
 
         assertEquals("franklin!", impl.getPath());
 
-        DependentItsco other = constructor.newInstance(mockBacker, mockShared);
+        DependentConfigObject other = constructor.newInstance(mockBacker, mockShared);
         assertEquals(impl, other);
         assertEquals("hashCodes", impl.hashCode(), other.hashCode());
         assertEquals("toString", impl.toString(), other.toString());

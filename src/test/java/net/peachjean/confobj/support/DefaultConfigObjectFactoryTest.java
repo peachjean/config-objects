@@ -1,8 +1,8 @@
 package net.peachjean.confobj.support;
 
-import net.peachjean.confobj.support.example.CompoundItsco;
-import net.peachjean.confobj.support.example.ExampleItsco;
-import net.peachjean.confobj.support.example.shared.MasterItsco;
+import net.peachjean.confobj.support.example.CompoundConfigObject;
+import net.peachjean.confobj.support.example.ExampleConfigObject;
+import net.peachjean.confobj.support.example.shared.MasterConfigObject;
 import org.apache.bval.jsr303.ApacheValidationProvider;
 import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.commons.configuration.Configuration;
@@ -25,19 +25,19 @@ public class DefaultConfigObjectFactoryTest {
 
         ConfigObjectFactory factory = new DefaultConfigObjectFactory();
 
-        ExampleItsco exampleItsco = factory.create(config, ExampleItsco.class);
+        ExampleConfigObject exampleConfigObject = factory.create(config, ExampleConfigObject.class);
 
-        assertEquals("I am zee value!", exampleItsco.getValue1());
-        assertEquals("secondValue", exampleItsco.getValue2());
-        assertEquals(88, exampleItsco.getIntValue().intValue());
+        assertEquals("I am zee value!", exampleConfigObject.getValue1());
+        assertEquals("secondValue", exampleConfigObject.getValue2());
+        assertEquals(88, exampleConfigObject.getIntValue().intValue());
 
-        Instantiator<ExampleItsco> generator = factory.createGenerator(ExampleItsco.class);
+        Instantiator<ExampleConfigObject> generator = factory.createGenerator(ExampleConfigObject.class);
 
-        ExampleItsco exampleItsco2 = generator.instantiate(config);
+        ExampleConfigObject exampleConfigObject2 = generator.instantiate(config);
 
-        assertEquals("I am zee value!", exampleItsco.getValue1());
-        assertEquals("secondValue", exampleItsco.getValue2());
-        assertEquals(88, exampleItsco.getIntValue().intValue());
+        assertEquals("I am zee value!", exampleConfigObject.getValue1());
+        assertEquals("secondValue", exampleConfigObject.getValue2());
+        assertEquals(88, exampleConfigObject.getIntValue().intValue());
     }
 
     @Test
@@ -48,18 +48,18 @@ public class DefaultConfigObjectFactoryTest {
 
         ConfigObjectFactory factory = new DefaultConfigObjectFactory();
 
-        ExampleItsco exampleItsco = factory.create(config, ExampleItsco.class);
+        ExampleConfigObject exampleConfigObject = factory.create(config, ExampleConfigObject.class);
 
-        assertEquals("I am zee value!", exampleItsco.getValue1());
-        assertEquals("secondValue", exampleItsco.getValue2());
-        assertEquals(88, exampleItsco.getIntValue().intValue());
+        assertEquals("I am zee value!", exampleConfigObject.getValue1());
+        assertEquals("secondValue", exampleConfigObject.getValue2());
+        assertEquals(88, exampleConfigObject.getIntValue().intValue());
 
         Validator validator = Validation.byProvider(ApacheValidationProvider.class).configure().buildValidatorFactory().getValidator();
-        final Set<ConstraintViolation<ExampleItsco>> violations = validator.validate(exampleItsco);
+        final Set<ConstraintViolation<ExampleConfigObject>> violations = validator.validate(exampleConfigObject);
         assertTrue(violations.isEmpty());
 
         config.setProperty("intValue", "120");
-        final Set<ConstraintViolation<ExampleItsco>> violations2 = validator.validate(exampleItsco);
+        final Set<ConstraintViolation<ExampleConfigObject>> violations2 = validator.validate(exampleConfigObject);
 
         assertFalse(violations2.isEmpty());
     }
@@ -72,39 +72,39 @@ public class DefaultConfigObjectFactoryTest {
 
         ConfigObjectFactory factory = new DefaultConfigObjectFactory();
 
-        ExampleItsco exampleItsco = factory.create(config, ExampleItsco.class);
+        ExampleConfigObject exampleConfigObject = factory.create(config, ExampleConfigObject.class);
 
-        assertEquals("I am zee value!", exampleItsco.getValue1());
-        assertEquals("secondValue", exampleItsco.getValue2());
-        assertEquals(88, exampleItsco.getIntValue().intValue());
+        assertEquals("I am zee value!", exampleConfigObject.getValue1());
+        assertEquals("secondValue", exampleConfigObject.getValue2());
+        assertEquals(88, exampleConfigObject.getIntValue().intValue());
 
         config.setProperty("intValue", "42");
 
-        assertEquals(42, exampleItsco.getIntValue().intValue());
+        assertEquals(42, exampleConfigObject.getIntValue().intValue());
     }
 
     @Test
-    public void compoundItscoExample() {
+    public void compoundConfigObjectExample() {
         Configuration config = new BaseConfiguration();
-        config.setProperty("subItsco.value1", "I am zee value!");
-        config.setProperty("subItsco.intValue", "88");
+        config.setProperty("subConfigObject.value1", "I am zee value!");
+        config.setProperty("subConfigObject.intValue", "88");
 
 
         ConfigObjectFactory factory = new DefaultConfigObjectFactory();
 
-        CompoundItsco compoundItsco = factory.create(config, CompoundItsco.class);
-        ExampleItsco exampleItsco = compoundItsco.getSubItsco();
+        CompoundConfigObject compoundConfigObject = factory.create(config, CompoundConfigObject.class);
+        ExampleConfigObject exampleConfigObject = compoundConfigObject.getSubConfigObject();
 
-        assertEquals("I am zee value!", exampleItsco.getValue1());
-        assertEquals("secondValue", exampleItsco.getValue2());
-        assertEquals(88, exampleItsco.getIntValue().intValue());
-        assertEquals("secondValue", compoundItsco.getMyString());
-        assertEquals(88 * 4.5f, compoundItsco.getMyFloat(), 0.0002);
+        assertEquals("I am zee value!", exampleConfigObject.getValue1());
+        assertEquals("secondValue", exampleConfigObject.getValue2());
+        assertEquals(88, exampleConfigObject.getIntValue().intValue());
+        assertEquals("secondValue", compoundConfigObject.getMyString());
+        assertEquals(88 * 4.5f, compoundConfigObject.getMyFloat(), 0.0002);
 
-        config.setProperty("subItsco.intValue", "42");
+        config.setProperty("subConfigObject.intValue", "42");
 
-        assertEquals(42, exampleItsco.getIntValue().intValue());
-        assertEquals(42 * 4.5f, compoundItsco.getMyFloat(), 0.0002);
+        assertEquals(42, exampleConfigObject.getIntValue().intValue());
+        assertEquals(42 * 4.5f, compoundConfigObject.getMyFloat(), 0.0002);
     }
 
     @Test
@@ -114,10 +114,10 @@ public class DefaultConfigObjectFactoryTest {
         config.setProperty("shared.maxSize", "67");
 
         ConfigObjectFactory factory = new DefaultConfigObjectFactory();
-        MasterItsco masterItsco = factory.create(config, MasterItsco.class);
+        MasterConfigObject masterConfigObject = factory.create(config, MasterConfigObject.class);
 
-        assertEquals("myNamespace", masterItsco.getShared().getNamespace());
-        assertEquals(67, masterItsco.getShared().getMaxSize().intValue());
-        assertEquals("myNamespace/myFile", masterItsco.getDependent().getPath());
+        assertEquals("myNamespace", masterConfigObject.getShared().getNamespace());
+        assertEquals(67, masterConfigObject.getShared().getMaxSize().intValue());
+        assertEquals("myNamespace/myFile", masterConfigObject.getDependent().getPath());
     }
 }

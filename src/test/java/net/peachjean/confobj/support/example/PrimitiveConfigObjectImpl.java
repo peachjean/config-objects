@@ -2,8 +2,8 @@ package net.peachjean.confobj.support.example;
 
 import net.peachjean.confobj.support.ConfigObjectBacker;
 
-public class PrimitiveItscoImpl extends PrimitiveItsco.Defaults implements PrimitiveItsco {
-    private final ConfigObjectBacker<PrimitiveItsco> backer;
+public class PrimitiveConfigObjectImpl extends PrimitiveConfigObject.Defaults implements PrimitiveConfigObject {
+    private final ConfigObjectBacker<PrimitiveConfigObject> backer;
 
     private boolean booleanValue;
     private byte byteValue;
@@ -14,7 +14,7 @@ public class PrimitiveItscoImpl extends PrimitiveItsco.Defaults implements Primi
     private float floatValue;
     private double doubleValue;
 
-    public PrimitiveItscoImpl(ConfigObjectBacker<PrimitiveItsco> backer) {
+    public PrimitiveConfigObjectImpl(ConfigObjectBacker<PrimitiveConfigObject> backer) {
         this.backer = backer;
         backer.setContaining(this);
     }
@@ -104,7 +104,7 @@ public class PrimitiveItscoImpl extends PrimitiveItsco.Defaults implements Primi
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        PrimitiveItscoImpl that = (PrimitiveItscoImpl) o;
+        PrimitiveConfigObjectImpl that = (PrimitiveConfigObjectImpl) o;
 
         if (getBooleanValue() != that.getBooleanValue()) return false;
         if (getByteValue() != that.getByteValue()) return false;
@@ -136,7 +136,7 @@ public class PrimitiveItscoImpl extends PrimitiveItsco.Defaults implements Primi
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("PrimitiveItsco");
+        StringBuilder sb = new StringBuilder("PrimitiveConfigObject");
         sb.append("{");
         sb.append("booleanValue=").append(getBooleanValue());
         sb.append(", ").append("byteValue=").append(getByteValue());

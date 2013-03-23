@@ -2,15 +2,15 @@ package net.peachjean.confobj.support.example;
 
 import net.peachjean.confobj.support.ConfigObjectBacker;
 
-public class ExampleItscoImpl extends ExampleItsco.Defaults implements ExampleItsco {
+public class ExampleConfigObjectImpl extends ExampleConfigObject.Defaults implements ExampleConfigObject {
 
-    private final ConfigObjectBacker<ExampleItsco> backer;
+    private final ConfigObjectBacker<ExampleConfigObject> backer;
 
     private String value1;
     private String value2;
     private Integer intValue;
 
-    public ExampleItscoImpl(final ConfigObjectBacker<ExampleItsco> backer) {
+    public ExampleConfigObjectImpl(final ConfigObjectBacker<ExampleConfigObject> backer) {
         this.backer = backer;
         backer.setContaining(this);
     }
@@ -33,9 +33,9 @@ public class ExampleItscoImpl extends ExampleItsco.Defaults implements ExampleIt
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null) return false;
-        if (! (o instanceof ExampleItsco)) return false;
+        if (! (o instanceof ExampleConfigObject)) return false;
 
-        ExampleItsco that = (ExampleItsco) o;
+        ExampleConfigObject that = (ExampleConfigObject) o;
 
         if (getIntValue() != null ? !getIntValue().equals(that.getIntValue()) : that.getIntValue() != null) return false;
         if (getValue1() != null ? !getValue1().equals(that.getValue1()) : that.getValue1() != null) return false;
@@ -56,7 +56,7 @@ public class ExampleItscoImpl extends ExampleItsco.Defaults implements ExampleIt
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("ExampleItsco");
+        StringBuilder sb = new StringBuilder("ExampleConfigObject");
         sb.append("{");
         sb.append("intValue=").append(getIntValue());
         sb.append(", ").append("value1=").append(getValue1());

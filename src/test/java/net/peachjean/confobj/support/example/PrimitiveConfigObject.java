@@ -1,6 +1,6 @@
 package net.peachjean.confobj.support.example;
 
-public interface PrimitiveItsco {
+public interface PrimitiveConfigObject {
 
     static final boolean DEFAULT_BOOLEAN = true;
     static final int DEFAULT_BYTE = 0x30;
@@ -43,7 +43,7 @@ public interface PrimitiveItsco {
 
     double getDoubleValue2();
 
-    public static abstract class Defaults implements PrimitiveItsco {
+    public static abstract class Defaults implements PrimitiveConfigObject {
 
         @Override
         public boolean getBooleanValue2() {
