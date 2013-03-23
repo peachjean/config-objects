@@ -4,19 +4,16 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>net.peachjean.itsco</groupId>
-    <artifactId>itsco-parent</artifactId>
+    <groupId>net.peachjean.confobj</groupId>
+    <artifactId>config-objects</artifactId>
     <version>0.1.0-SNAPSHOT</version>
-    <!--<modules>-->
-        <!--<module>itsco-core</module>-->
-    <!--</modules>-->
     <packaging>jar</packaging>
-    <name>ITSCO</name>
-    <description>Immutable Type-Safe Configuration Objects</description>
+    <name>Config Objects</name>
+    <description>Config Objects</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <tater.version>0.2-SNAPSHOT</tater.version>
+        <tater.version>0.2</tater.version>
     </properties>
 
     <dependencies>
@@ -34,6 +31,7 @@
             <groupId>org.ow2.asm</groupId>
             <artifactId>asm-util</artifactId>
             <version>4.1</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -63,7 +61,7 @@
         <dependency>
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
-            <version>4.0-SNAPSHOT</version>
+            <version>4.0-20130322.182931-187</version>
         </dependency>
         <dependency>
             <groupId>javax.inject</groupId>
@@ -132,6 +130,39 @@
                     <target>1.6</target>
                     <source>1.6</source>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>2.0</version>
+                <executions>
+                    <execution>
+                        <id>shade</id>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <createDependencyReducedPom>true</createDependencyReducedPom>
+                            <dependencyReducedPomLocation>${project.build.directory}/dependency-reduced-pom.xml</dependencyReducedPomLocation>
+                            <relocations>
+                                <relocation>
+                                    <pattern>org.apache.commons.collections</pattern>
+                                    <shadedPattern>net.peachjean.confobj._repkg.org.apache.commons.collections</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.objectweb.asm</pattern>
+                                    <shadedPattern>net.peachjean.confobj._repkg.org.objectweb.asm</shadedPattern>
+                                </relocation>
+                            </relocations>
+                            <artifactSet>
+                                <includes>
+                                    <include>commons-collections:commons-collections</include>
+                                    <include>org.ow2.asm:asm</include>
+                                </includes>
+                            </artifactSet>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
