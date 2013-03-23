@@ -10,6 +10,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -56,6 +58,12 @@ public class AsmImplementationGenerator implements ImplementationGenerator {
         }
 
         private byte[] generateByteCode() {
+            Collections.sort(fields, new Comparator<FieldModel>() {
+                @Override
+                public int compare(FieldModel o1, FieldModel o2) {
+                    return o1.name.compareTo(o2.name);
+                }
+            });
             ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
 
             cw.visit(V1_5, getClassVisibility() + ACC_SUPER, generateAsmImplName(), null, generateAsmSuperClassName(), new String[] { generateAsmInterfaceName() });
@@ -182,7 +190,7 @@ public class AsmImplementationGenerator implements ImplementationGenerator {
                 } else {
                     first = false;
                 }
-                mv.visitLdcInsn("value1=");
+                mv.visitLdcInsn(field.name + "=");
                 appendLast(mv);
                 mv.visitVarInsn(ALOAD, 0);
                 field.invoke(mv, itscoClass);

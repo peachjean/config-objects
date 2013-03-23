@@ -1,6 +1,7 @@
 package net.peachjean.itsco.support;
 
 import org.junit.Ignore;
+import org.junit.Test;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -13,6 +14,7 @@ public class InlineImplementationGeneratorTest extends AbstractImplementationGen
 
     @Override
     @Ignore("This is not implemented for the inline generator")
+    @Test
     public void sharedDependencyExample() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         super.sharedDependencyExample();
     }

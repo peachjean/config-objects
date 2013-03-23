@@ -59,9 +59,9 @@ public class ExampleItscoImpl extends ExampleItsco.Defaults implements ExampleIt
     public String toString() {
         StringBuilder sb = new StringBuilder("ExampleItsco");
         sb.append("{");
-        sb.append("value1=").append(getValue1());
+        sb.append("intValue=").append(getIntValue());
+        sb.append(", ").append("value1=").append(getValue1());
         sb.append(", ").append("value2=").append(getValue2());
-        sb.append(", ").append("intValue=").append(getIntValue());
         sb.append("}");
         return sb.toString();
     }
