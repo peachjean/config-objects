@@ -88,22 +88,22 @@ public abstract class AbstractImplementationGeneratorTest {
         assertNotNull(impl);
 
         assertEquals(false, impl.getBooleanValue());
-//        assertEquals((byte) 0xFE, impl.getByteValue());
-//        assertEquals('x', impl.getCharValue());
-//        assertEquals(3, impl.getShortValue());
-//        assertEquals(12, impl.getIntValue());
-//        assertEquals(49l, impl.getLongValue());
-//        assertEquals(55.555f, impl.getFloatValue(), 0.00002);
-//        assertEquals(23.39389, impl.getDoubleValue(), 0.000002);
-//
-//        assertEquals(false, impl.getBooleanValue2());
-//        assertEquals((byte) 0xFE, impl.getByteValue2());
-//        assertEquals('x', impl.getCharValue2());
-//        assertEquals(3, impl.getShortValue2());
-//        assertEquals(12, impl.getIntValue2());
-//        assertEquals(49l, impl.getLongValue2());
-//        assertEquals(55.555f, impl.getFloatValue2(), 0.00002);
-//        assertEquals(23.39389, impl.getDoubleValue2(), 0.000002);
+        assertEquals((byte) 0xFE, impl.getByteValue());
+        assertEquals('x', impl.getCharValue());
+        assertEquals(3, impl.getShortValue());
+        assertEquals(12, impl.getIntValue());
+        assertEquals(49l, impl.getLongValue());
+        assertEquals(55.555f, impl.getFloatValue(), 0.00002);
+        assertEquals(23.39389, impl.getDoubleValue(), 0.000002);
+
+        assertEquals(false, impl.getBooleanValue2());
+        assertEquals((byte) 0xFE, impl.getByteValue2());
+        assertEquals('x', impl.getCharValue2());
+        assertEquals(3, impl.getShortValue2());
+        assertEquals(12, impl.getIntValue2());
+        assertEquals(49l, impl.getLongValue2());
+        assertEquals(55.555f, impl.getFloatValue2(), 0.00002);
+        assertEquals(23.39389, impl.getDoubleValue2(), 0.000002);
 //
         PrimitiveItsco other = constructor.newInstance(mockBacker);
         assertEquals(impl, other);

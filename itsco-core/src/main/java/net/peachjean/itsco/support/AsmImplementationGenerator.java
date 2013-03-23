@@ -4,11 +4,7 @@ import net.peachjean.itsco.introspection.ItscoIntrospector;
 import net.peachjean.itsco.introspection.ItscoVisitor;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Label;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Type;
-import org.objectweb.asm.signature.SignatureWriter;
+import org.objectweb.asm.*;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -36,6 +32,10 @@ public class AsmImplementationGenerator implements ImplementationGenerator {
         return ItscoIntrospector.<T, ItscoModel<T>>visitMembers(itscoClass, new ItscoModel<T>(itscoClass, classLoaderMap), new AsmVisitor<T>()).implement();
     }
 
+    public <T> byte[] generateByteCode(Class<T> itscoClass) {
+        return ItscoIntrospector.visitMembers(itscoClass, new ItscoModel<T>(itscoClass, classLoaderMap), new AsmVisitor<T>()).generateByteCode();
+    }
+
     private static class ItscoModel<T> {
 
         private static final Type BACKER_TYPE = Type.getObjectType(Type.getInternalName(ItscoBacker.class));
@@ -52,6 +52,10 @@ public class AsmImplementationGenerator implements ImplementationGenerator {
         }
 
         public Class<? extends T> implement() {
+            return this.getClassLoaderFor(itscoClass).defineClass(this.generateImplName(), generateByteCode());
+        }
+
+        private byte[] generateByteCode() {
             ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
 
             cw.visit(V1_5, getClassVisibility() + ACC_SUPER, generateAsmImplName(), null, generateAsmSuperClassName(), new String[] { generateAsmInterfaceName() });
@@ -69,8 +73,7 @@ public class AsmImplementationGenerator implements ImplementationGenerator {
             createHashCodeMethod(cw);
 
             createToStringMethod(cw);
-
-            return this.getClassLoaderFor(itscoClass).defineClass(this.generateImplName(), cw.toByteArray());
+            return cw.toByteArray();
         }
 
         private void createEqualsMethod(ClassWriter cw) {
@@ -374,11 +377,19 @@ public class AsmImplementationGenerator implements ImplementationGenerator {
         }
 
         public void invokeEquals(MethodVisitor mv) {
-            mv.visitMethodInsn(INVOKEVIRTUAL, Type.getInternalName(type), "equals", "(Ljava/lang/Object;)Z");
+            if(this.type.isInterface()) {
+                mv.visitMethodInsn(INVOKEINTERFACE, Type.getInternalName(type), "equals", "(Ljava/lang/Object;)Z");
+            } else {
+                mv.visitMethodInsn(INVOKEVIRTUAL, Type.getInternalName(type), "equals", "(Ljava/lang/Object;)Z");
+            }
         }
 
         public void invokeHashCode(MethodVisitor mv) {
-            mv.visitMethodInsn(INVOKEVIRTUAL, Type.getInternalName(type), "hashCode", "()I");
+            if(this.type.isInterface()) {
+                mv.visitMethodInsn(INVOKEINTERFACE, Type.getInternalName(type), "hashCode", "()I");
+            } else {
+                mv.visitMethodInsn(INVOKEVIRTUAL, Type.getInternalName(type), "hashCode", "()I");
+            }
         }
 
         public void doEqualsCompare(MethodVisitor mv, Class itscoClass) {
@@ -570,5 +581,7 @@ public class AsmImplementationGenerator implements ImplementationGenerator {
         public <T> Class<? extends T> defineClass(String name, byte[] bytes) {
             return (Class<? extends T>) super.defineClass(name, bytes, 0, bytes.length);
         }
+
+
     }
 }

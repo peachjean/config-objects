@@ -94,10 +94,10 @@ public class PrimitiveItscoImpl extends PrimitiveItsco.Defaults implements Primi
         return backer.lookup("floatValue", Float.class, super.getFloatValue2());
     }
 
-    //@Override
-//    public double getDoubleValue2() {
-//        return backer.lookup("doubleValue", Double.class, super.getDoubleValue2());
-//    }
+    @Override
+    public double getDoubleValue2() {
+        return backer.lookup("doubleValue", Double.class, super.getDoubleValue2());
+    }
 
     @Override
     public boolean equals(Object o) {
