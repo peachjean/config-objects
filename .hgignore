@@ -34,9 +34,6 @@ atlassian-ide-plugin.xml
 # vim
 .*.sw[a-p]
 
-# merge tooling
-*.orig
-
 #maven
 *.versionsBackup
 
