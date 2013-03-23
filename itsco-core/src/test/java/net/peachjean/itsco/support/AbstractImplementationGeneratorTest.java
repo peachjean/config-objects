@@ -166,7 +166,7 @@ public abstract class AbstractImplementationGeneratorTest {
         mockBacker.setContaining(anyObject(DependentItsco.class));
         EasyMock.expectLastCall().anyTimes();
 
-        expect(mockBacker.lookup("path", String.class, "myNamespace/myFile")).andReturn("franklin!");
+        expect(mockBacker.lookup("path", String.class, "myNamespace/myFile")).andReturn("franklin!").anyTimes();
         expect(mockShared.getNamespace()).andReturn("myNamespace").anyTimes();
         expect(mockShared.getMaxSize()).andReturn(67).anyTimes();
 
@@ -181,7 +181,7 @@ public abstract class AbstractImplementationGeneratorTest {
 
         assertEquals("franklin!", impl.getPath());
 
-        DependentItsco other = constructor.newInstance(mockBacker);
+        DependentItsco other = constructor.newInstance(mockBacker, mockShared);
         assertEquals(impl, other);
         assertEquals("hashCodes", impl.hashCode(), other.hashCode());
         assertEquals("toString", impl.toString(), other.toString());
