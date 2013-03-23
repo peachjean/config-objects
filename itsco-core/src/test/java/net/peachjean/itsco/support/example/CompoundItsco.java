@@ -8,12 +8,12 @@ public interface CompoundItsco {
     Float getMyFloat();
 
     public static abstract class Defaults implements CompoundItsco {
-        @Override
+//        @Override
         public String getMyString() {
             return this.getSubItsco().getValue2();
         }
 
-        @Override
+//        @Override
         public Float getMyFloat() {
             return this.getSubItsco().getIntValue() * 4.5f;
         }

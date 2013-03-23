@@ -7,6 +7,10 @@ public class ExampleItscoImpl extends ExampleItsco.Defaults implements ExampleIt
 
     private final ItscoBacker<ExampleItsco> backer;
 
+    private String value1;
+    private String value2;
+    private Integer intValue;
+
     public ExampleItscoImpl(final ItscoBacker<ExampleItsco> backer) {
         this.backer = backer;
         backer.setContaining(this);
@@ -27,34 +31,38 @@ public class ExampleItscoImpl extends ExampleItsco.Defaults implements ExampleIt
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hashCode(getValue1(), getValue2(), getIntValue());
-    }
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+        if (! (o instanceof ExampleItsco)) return false;
 
-    @Override
-    public boolean equals(final Object obj) {
-        if (!(obj instanceof ExampleItsco)) {
-            return false;
-        }
-        ExampleItsco other = (ExampleItsco) obj;
-        if (!Objects.equal(this.getValue1(), other.getValue1())) {
-            return false;
-        }
-        if (!Objects.equal(this.getValue2(), other.getValue2())) {
-            return false;
-        }
-        if (!Objects.equal(this.getIntValue(), other.getIntValue())) {
-            return false;
-        }
+        ExampleItsco that = (ExampleItsco) o;
+
+        if (getIntValue() != null ? !getIntValue().equals(that.getIntValue()) : that.getIntValue() != null) return false;
+        if (getValue1() != null ? !getValue1().equals(that.getValue1()) : that.getValue1() != null) return false;
+        if (getValue2() != null ? !getValue2().equals(that.getValue2()) : that.getValue2() != null) return false;
+
         return true;
     }
 
     @Override
+    public int hashCode() {
+        int result = 0;
+        result = 31 * result + (getValue1() != null ? getValue1().hashCode() : 0);
+        result = 31 * result + (getValue2() != null ? getValue2().hashCode() : 0);
+        result = 31 * result + (getIntValue() != null ? getIntValue().hashCode() : 0);
+        return result;
+    }
+
+
+    @Override
     public String toString() {
-        return Objects.toStringHelper(ExampleItsco.class)
-                .add("intValue", this.getIntValue())
-                .add("value1", this.getValue1())
-                .add("value2", this.getValue2())
-                .toString();
+        StringBuilder sb = new StringBuilder("ExampleItsco");
+        sb.append("{");
+        sb.append("value1=").append(getValue1());
+        sb.append(", ").append("value2=").append(getValue2());
+        sb.append(", ").append("intValue=").append(getIntValue());
+        sb.append("}");
+        return sb.toString();
     }
 }

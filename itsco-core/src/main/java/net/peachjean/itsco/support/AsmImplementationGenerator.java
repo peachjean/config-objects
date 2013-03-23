@@ -117,27 +117,7 @@ public class AsmImplementationGenerator implements ImplementationGenerator {
 //            if (getValue1() != null ? !getValue1().equals(that.getValue1()) : that.getValue1() != null) return false;
 //            if (getValue2() != null ? !getValue2().equals(that.getValue2()) : that.getValue2() != null) return false;
             for(FieldModel field: fields) {
-                mv.visitVarInsn(ALOAD, 0);
-                field.invoke(mv, itscoClass);
-                Label l1 = new Label();
-                mv.visitJumpInsn(IFNULL, l1);
-                mv.visitVarInsn(ALOAD, 0);
-                field.invoke(mv, itscoClass);
-                mv.visitVarInsn(ALOAD, 2);
-                field.invoke(mv, itscoClass);
-                field.invokeEquals(mv);
-                Label l2 = new Label();
-                mv.visitJumpInsn(IFNE, l2);
-                Label l3 = new Label();
-                mv.visitJumpInsn(GOTO, l3);
-                mv.visitLabel(l1);
-                mv.visitVarInsn(ALOAD, 2);
-                field.invoke(mv, itscoClass);
-                mv.visitJumpInsn(IFNONNULL, l2);
-                mv.visitLabel(l3);
-                mv.visitInsn(FALSE);
-                mv.visitInsn(IRETURN);
-                mv.visitLabel(l2);
+                field.doEqualsCompare(mv, itscoClass);
             }
 //            return true;
             mv.visitInsn(TRUE);
@@ -157,23 +137,7 @@ public class AsmImplementationGenerator implements ImplementationGenerator {
 //            result = 31 * result + (getValue2() != null ? getValue2().hashCode() : 0);
 //            result = 31 * result + (getIntValue() != null ? getIntValue().hashCode() : 0);
             for(FieldModel field: fields) {
-                mv.visitIntInsn(BIPUSH, 31);
-                mv.visitVarInsn(ILOAD, 1);
-                mv.visitInsn(IMUL);
-                mv.visitVarInsn(ALOAD, 0);
-                field.invoke(mv, itscoClass);
-                Label l0 = new Label();
-                mv.visitJumpInsn(IFNULL, l0);
-                mv.visitVarInsn(ALOAD, 0);
-                field.invoke(mv, itscoClass);
-                field.invokeHashCode(mv);
-                Label l1 = new Label();
-                mv.visitJumpInsn(GOTO, l1);
-                mv.visitLabel(l0);
-                mv.visitInsn(ICONST_0);
-                mv.visitLabel(l1);
-                mv.visitInsn(IADD);
-                mv.visitVarInsn(ISTORE, 1);
+                field.doHashCode(mv, itscoClass);
             }
 //            return result;
             mv.visitVarInsn(ILOAD, 1);
@@ -219,7 +183,8 @@ public class AsmImplementationGenerator implements ImplementationGenerator {
                 appendLast(mv);
                 mv.visitVarInsn(ALOAD, 0);
                 field.invoke(mv, itscoClass);
-                appendLast(mv);
+                appendLast(mv, field.primitiveType == null ? Object.class : field.primitiveType);
+//                appendLast(mv);
                 mv.visitInsn(POP);
             }
 // sb.append("}");
@@ -238,7 +203,13 @@ public class AsmImplementationGenerator implements ImplementationGenerator {
         }
 
         private void appendLast(MethodVisitor mv) {
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/Object;)Ljava/lang/StringBuilder;");
+            this.appendLast(mv, Object.class);
+        }
+
+        private void appendLast(MethodVisitor mv, Class type) {
+            // append(byte) and append(short) don't exist - we need to use append(int) instead
+            String descriptor = (type == byte.class || type == short.class) ? "I" : Type.getDescriptor(type);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(" + descriptor + ")Ljava/lang/StringBuilder;");
         }
 
         private void createFieldMethod(ClassWriter cw, FieldModel field) {
@@ -395,7 +366,11 @@ public class AsmImplementationGenerator implements ImplementationGenerator {
         }
 
         public void invoke(MethodVisitor mv, Class itscoType) {
-            mv.visitMethodInsn(INVOKEINTERFACE, Type.getInternalName(itscoType), methodName, "()" + Type.getDescriptor(type));
+            if(this.primitiveType == null) {
+                mv.visitMethodInsn(INVOKEINTERFACE, Type.getInternalName(itscoType), methodName, "()" + Type.getDescriptor(type));
+            } else {
+                mv.visitMethodInsn(INVOKEINTERFACE, Type.getInternalName(itscoType), methodName, "()" + Type.getDescriptor(primitiveType));
+            }
         }
 
         public void invokeEquals(MethodVisitor mv) {
@@ -404,6 +379,162 @@ public class AsmImplementationGenerator implements ImplementationGenerator {
 
         public void invokeHashCode(MethodVisitor mv) {
             mv.visitMethodInsn(INVOKEVIRTUAL, Type.getInternalName(type), "hashCode", "()I");
+        }
+
+        public void doEqualsCompare(MethodVisitor mv, Class itscoClass) {
+            if(this.primitiveType != null) {
+                mv.visitVarInsn(ALOAD, 0);
+                this.invoke(mv, itscoClass);
+                mv.visitVarInsn(ALOAD, 2);
+                this.invoke(mv, itscoClass);
+                Label l = new Label();
+                if(this.primitiveType.equals(double.class)) {
+                    mv.visitMethodInsn(INVOKESTATIC, "java/lang/Double", "compare", "(DD)I");
+                    mv.visitJumpInsn(IFEQ, l);
+                } else if(this.primitiveType.equals(float.class)) {
+                    mv.visitMethodInsn(INVOKESTATIC, "java/lang/Float", "compare", "(FF)I");
+                    mv.visitJumpInsn(IFEQ, l);
+                } else if(this.primitiveType.equals(long.class)) {
+                    mv.visitInsn(LCMP);
+                    mv.visitJumpInsn(IFEQ, l);
+                } else {
+                    mv.visitJumpInsn(IF_ICMPEQ, l);
+                }
+                mv.visitInsn(FALSE);
+                mv.visitInsn(IRETURN);
+                mv.visitLabel(l);
+            } else {
+                mv.visitVarInsn(ALOAD, 0);
+                this.invoke(mv, itscoClass);
+                Label l1 = new Label();
+                mv.visitJumpInsn(IFNULL, l1);
+                mv.visitVarInsn(ALOAD, 0);
+                this.invoke(mv, itscoClass);
+                mv.visitVarInsn(ALOAD, 2);
+                this.invoke(mv, itscoClass);
+                this.invokeEquals(mv);
+                Label l2 = new Label();
+                mv.visitJumpInsn(IFNE, l2);
+                Label l3 = new Label();
+                mv.visitJumpInsn(GOTO, l3);
+                mv.visitLabel(l1);
+                mv.visitVarInsn(ALOAD, 2);
+                this.invoke(mv, itscoClass);
+                mv.visitJumpInsn(IFNONNULL, l2);
+                mv.visitLabel(l3);
+                mv.visitInsn(FALSE);
+                mv.visitInsn(IRETURN);
+                mv.visitLabel(l2);
+            }
+        }
+
+        public void doHashCode(MethodVisitor mv, Class itscoClass) {
+            if(primitiveType != null) {
+                if(primitiveType.equals(boolean.class)) {
+                    mv.visitIntInsn(BIPUSH, 31);
+                    mv.visitVarInsn(ILOAD, 1);
+                    mv.visitInsn(IMUL);
+                    mv.visitVarInsn(ALOAD, 0);
+                    invoke(mv, itscoClass);
+                    Label l0 = new Label();
+                    mv.visitJumpInsn(IFEQ, l0);
+                    mv.visitInsn(ICONST_1);
+                    Label l1 = new Label();
+                    mv.visitJumpInsn(GOTO, l1);
+                    mv.visitLabel(l0);
+                    mv.visitInsn(ICONST_0);
+                    mv.visitLabel(l1);
+                    mv.visitInsn(IADD);
+                    mv.visitVarInsn(ISTORE, 1);
+                } else if(primitiveType.equals(long.class)) {
+                    mv.visitIntInsn(BIPUSH, 31);
+                    mv.visitVarInsn(ILOAD, 1);
+                    mv.visitInsn(IMUL);
+                    mv.visitVarInsn(ALOAD, 0);
+                    invoke(mv, itscoClass);
+                    mv.visitVarInsn(ALOAD, 0);
+                    invoke(mv, itscoClass);
+                    mv.visitIntInsn(BIPUSH, 32);
+                    mv.visitInsn(LUSHR);
+                    mv.visitInsn(LXOR);
+                    mv.visitInsn(L2I);
+                    mv.visitInsn(IADD);
+                    mv.visitVarInsn(ISTORE, 1);
+                } else if(primitiveType.equals(float.class)) {
+                    mv.visitIntInsn(BIPUSH, 31);
+                    mv.visitVarInsn(ILOAD, 1);
+                    mv.visitInsn(IMUL);
+                    mv.visitVarInsn(ALOAD, 0);
+                    invoke(mv, itscoClass);
+                    mv.visitInsn(FCONST_0);
+                    mv.visitInsn(FCMPL);
+                    Label l0 = new Label();
+                    mv.visitJumpInsn(IFEQ, l0);
+                    mv.visitVarInsn(ALOAD, 0);
+                    invoke(mv, itscoClass);
+                    mv.visitMethodInsn(INVOKESTATIC, "java/lang/Float", "floatToIntBits", "(F)I");
+                    Label l1 = new Label();
+                    mv.visitJumpInsn(GOTO, l1);
+                    mv.visitLabel(l0);
+                    mv.visitInsn(ICONST_0);
+                    mv.visitLabel(l1);
+                    mv.visitInsn(IADD);
+                    mv.visitVarInsn(ISTORE, 1);
+                } else if(primitiveType.equals(double.class)) {
+                    mv.visitVarInsn(ALOAD, 0);
+                    invoke(mv, itscoClass);
+                    mv.visitInsn(DCONST_0);
+                    mv.visitInsn(DCMPL);
+                    Label l4 = new Label();
+                    mv.visitJumpInsn(IFEQ, l4);
+                    mv.visitVarInsn(ALOAD, 0);
+                    invoke(mv, itscoClass);
+                    mv.visitMethodInsn(INVOKESTATIC, "java/lang/Double", "doubleToLongBits", "(D)J");
+                    Label l5 = new Label();
+                    mv.visitJumpInsn(GOTO, l5);
+                    mv.visitLabel(l4);
+                    mv.visitInsn(LCONST_0);
+                    mv.visitLabel(l5);
+                    mv.visitVarInsn(LSTORE, 2);
+                    mv.visitVarInsn(BIPUSH, 31);
+                    mv.visitIntInsn(ILOAD, 1);
+                    mv.visitInsn(IMUL);
+                    mv.visitVarInsn(LLOAD, 2);
+                    mv.visitVarInsn(LLOAD, 2);
+                    mv.visitIntInsn(BIPUSH, 32);
+                    mv.visitInsn(LUSHR);
+                    mv.visitInsn(LXOR);
+                    mv.visitInsn(L2I);
+                    mv.visitInsn(IADD);
+                    mv.visitVarInsn(ISTORE, 1);
+                } else {
+                    mv.visitIntInsn(BIPUSH, 31);
+                    mv.visitVarInsn(ILOAD, 1);
+                    mv.visitInsn(IMUL);
+                    mv.visitVarInsn(ALOAD, 0);
+                    invoke(mv, itscoClass);
+                    mv.visitInsn(IADD);
+                    mv.visitVarInsn(ISTORE, 1);
+                }
+            } else {
+                mv.visitIntInsn(BIPUSH, 31);
+                mv.visitVarInsn(ILOAD, 1);
+                mv.visitInsn(IMUL);
+                mv.visitVarInsn(ALOAD, 0);
+                this.invoke(mv, itscoClass);
+                Label l0 = new Label();
+                mv.visitJumpInsn(IFNULL, l0);
+                mv.visitVarInsn(ALOAD, 0);
+                this.invoke(mv, itscoClass);
+                this.invokeHashCode(mv);
+                Label l1 = new Label();
+                mv.visitJumpInsn(GOTO, l1);
+                mv.visitLabel(l0);
+                mv.visitInsn(ICONST_0);
+                mv.visitLabel(l1);
+                mv.visitInsn(IADD);
+                mv.visitVarInsn(ISTORE, 1);
+            }
         }
     }
 

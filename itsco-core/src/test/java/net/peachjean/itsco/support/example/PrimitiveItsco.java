@@ -25,7 +25,7 @@ public interface PrimitiveItsco {
 
     float getFloatValue();
 
-    double getDoubleValue();
+//    double getDoubleValue();
 
     boolean getBooleanValue2();
 
@@ -41,7 +41,7 @@ public interface PrimitiveItsco {
 
     float getFloatValue2();
 
-    double getDoubleValue2();
+//    double getDoubleValue2();
 
     public static abstract class Defaults implements PrimitiveItsco {
 
@@ -80,9 +80,9 @@ public interface PrimitiveItsco {
             return DEFAULT_FLOAT;
         }
 
-        @Override
-        public double getDoubleValue2() {
-            return DEFAULT_DOUBLE;
-        }
+//        @Override
+//        public double getDoubleValue2() {
+//            return DEFAULT_DOUBLE;
+//        }
     }
 }
