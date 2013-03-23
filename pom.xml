@@ -9,7 +9,6 @@
     <version>0.1.0-SNAPSHOT</version>
     <modules>
         <module>itsco-core</module>
-        <module>itsco-cli</module>
     </modules>
     <packaging>pom</packaging>
     <name>ITSCO</name>
