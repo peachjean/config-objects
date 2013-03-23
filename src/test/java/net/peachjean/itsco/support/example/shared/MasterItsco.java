@@ -1,7 +1,6 @@
 package net.peachjean.itsco.support.example.shared;
 
 import net.peachjean.itsco.Itsco;
-import net.peachjean.itsco.ItscoBinder;
 
 @Itsco
 public interface MasterItsco {

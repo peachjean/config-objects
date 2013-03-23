@@ -24,7 +24,7 @@ class StringResolutionStrategy implements FieldResolutionStrategy {
     }
 
     @Override
-    public boolean handlesReloading() {
+    public boolean isContextBacked() {
         return false;
     }
 }

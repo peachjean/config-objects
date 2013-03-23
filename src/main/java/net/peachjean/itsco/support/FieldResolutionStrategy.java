@@ -13,5 +13,13 @@ public interface FieldResolutionStrategy {
 
     boolean supports(Class<?> lookupType);
 
-    boolean handlesReloading();
+    /**
+     * If this method returns {@code true} then any object returned by {@link #resolve} will change dynamically as the
+     * backing configuration changes.
+     *
+     * This means that when a resolution strategy is context-backed, any clients should retain references returned by
+     * {@link #resolve}, rather than re-invoking it every time.
+     * @return
+     */
+    boolean isContextBacked();
 }

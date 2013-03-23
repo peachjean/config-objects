@@ -1,6 +1,5 @@
 package net.peachjean.itsco.support;
 
-import net.peachjean.itsco.Itsco;
 import org.apache.commons.configuration.Configuration;
 
 import java.util.HashMap;
@@ -15,7 +14,7 @@ public class DefaultItscoFactory implements ItscoFactory {
     private final FieldResolutionStrategy[] strategies = {
             StringResolutionStrategy.INSTANCE,
             ValueOfResolutionStrategy.INSTANCE,
-            new ItscoResolutionStrategy()
+            new ItscoResolutionStrategy(this)
     };
 
 
@@ -60,29 +59,6 @@ public class DefaultItscoFactory implements ItscoFactory {
         throw new IllegalStateException("No strategy to support type " + lookupType.getName());
     }
 
-    private class ItscoResolutionStrategy implements FieldResolutionStrategy {
-        @Override
-        public <T, C> T resolve(String name, Class<T> lookupType, Configuration configuration, C resolutionContext) {
-            if (!this.supports(lookupType)) {
-                throw new IllegalArgumentException("This strategy only supports itsco types, not " + lookupType.getName());
-            }
-
-            @SuppressWarnings("unchecked")
-            Configuration subContext = configuration.subset (name);
-            return DefaultItscoFactory.this.create(subContext, lookupType, new ObjectContext(resolutionContext));
-        }
-
-        @Override
-        public boolean supports(final Class<?> lookupType) {
-            return lookupType.isAnnotationPresent(Itsco.class);
-        }
-
-        @Override
-        public boolean handlesReloading() {
-            return true;
-        }
-    }
-
     private class DefaultItscoBacker<I> implements ItscoBacker<I> {
 
         // contains values that handle reloading on their own - these are often more expensive to create so we
@@ -106,7 +82,7 @@ public class DefaultItscoFactory implements ItscoFactory {
         public <T> T lookup(final String name, final Class<T> lookupType) {
             this.validateState();
             FieldResolutionStrategy resolutionStrategy = determineStrategy(lookupType);
-            if (resolutionStrategy.handlesReloading()) {
+            if (resolutionStrategy.isContextBacked()) {
                 if (cachedValues.containsKey(name)) {
                     return lookupType.cast(cachedValues.get(name));
                 }
@@ -115,7 +91,7 @@ public class DefaultItscoFactory implements ItscoFactory {
             if (resolved == null) {
                 throw new IllegalStateException("No value for " + name);
             }
-            if (resolutionStrategy.handlesReloading()) {
+            if (resolutionStrategy.isContextBacked()) {
                 cachedValues.put(name, resolved);
             }
             return resolved;

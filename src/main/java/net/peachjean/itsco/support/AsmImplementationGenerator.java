@@ -23,7 +23,7 @@ import static org.objectweb.asm.Opcodes.ICONST_1;
 /**
  * TODO:: Come back and fix error messages to be usable.
  */
-public class AsmImplementationGenerator implements ImplementationGenerator {
+class AsmImplementationGenerator implements ImplementationGenerator {
 
     public static final int TRUE = ICONST_1;
     public static final int FALSE = ICONST_0;

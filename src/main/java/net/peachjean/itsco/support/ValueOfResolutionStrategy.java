@@ -54,7 +54,7 @@ class ValueOfResolutionStrategy implements FieldResolutionStrategy {
     }
 
     @Override
-    public boolean handlesReloading() {
+    public boolean isContextBacked() {
         return false;
     }
 }
