@@ -1,11 +1,70 @@
-ITSCO
-=====
-Immutable, type-safe configuration objects (this name may change, it doesn't seem to describe all usecases)
+Config Objects
+==============
 
-This project has the goal of encapsulating several different, related patterns that I find myself using (and recreating)
-in multiple projects.  The idea is to separate the developer from the parsing, to locate configuration/parsing
-information as close to the applicable code as possible, and to enable discoverability APIs on available configuration
-parameters and structure fields.
+This project is part of an evoluation over multiple iterations in my quest to improve the state of configuration in
+object-oriented Java applications.
+
+Problems Addressed
+------------------
+
+1. Type Safety
+    Configuration parameters are not provided to the classes that use them in a type-safe manner. This means that we end
+    up with different parsing mechanisms and inconsistent error messages across our code base.
+2. Validation
+    Oftentimes, in addition to a type requirement, properties also must pass certain validation criteria. Perhaps we are
+    looking for a number from 1 to 10, or a 6-10 character string.
+3. Consistent Error Reporting
+    When the code for reading in, parsing, and validating properties is scattered across our codebase, we end up with a
+    multitude of error messages and states for the exact same sort of failure.
+4. Discoverability
+    If an application has users, then users need to configure it. This means that we need to document our configuration.
+    I frequently see undocumented parameters, out of date documentation, and a lack of type or validation information
+    for configuration parameters.
+5. Dynamicism
+    The majority of configuration patterns that I see don't have any allowance for configuration to change during the
+    application's lifecycle. This means that we end up with hacks, like continually parsing from `Properties` objects
+    or reloading static services.
+
+There are three common patterns that I tend to see for object configuration.
+
+1. Pass a `Properties` or `Configuration` object to a class's constructor. The class then parses the properties that it
+   is interested in and uses them.
+2. A class defines setters for any configuration parameters that it is interested in. An external framework or utility
+   parses configuration files and invokes these setters for relevant properties.
+3. A dependency injection framework is used where every value in a properties file is bound as a bean and some form of
+   autowiring is used to inject those parameters into the classes that need them.
+
+Approach
+--------
+
+This project attempts to define two major components.
+
+1. Pattern
+    A pattern for defining configuration objects.
+    a. Interface
+        The basic approach is that a user will define an interface of getter methods. Each method represents one
+        parameter. The types for these methods are typically simple types, supporting the `valueOf()` convention,
+        primitives, collections, or other configuration object types. These interfaces should be annotated with
+        `@ConfigObject`.
+    b. Validation
+        Each getter method may define JSR-303 validation annotations.
+    c. Documentation
+        A basic description of the parameter should be provided in the javadoc for the getter method.
+    d. Defaults
+        An abstract nested static class named `Defaults` may be defined for the interface. If defined, it should
+        implement any getters which should have defaults and return those defaults. Sometimes, default values depend on
+        the environment. The `Defaults` class may specify a constructor that gets passed the relevant environment
+        objects. JSR-330 `@Qualifier` annotations may be used on these constructor parameters.
+2. Implementation Support
+    Utilities for working with ConfigObject interfaces.
+    a. Introspection
+        A basic utility providing visitor-style introspection for a ConfigObject interface.
+    b. Implementation
+        A utility for dyamically implementing ConfigObject interfaces using [commons-configuration] `Configuration`
+        objects as the backing store. The entry point into this is the `ConfigObjectFactory` and the
+        `DefaultConfigObjectFactory` implementation.
+
+[commons-configuration]: http://commons.apache.org/configuration/
 
 Basic Use
 ---------
@@ -15,6 +74,7 @@ static abstract class of this interface, that implements this interface, named '
 methods implemented in 'Defaults' will be treated as default values.  Any methods that do not have default values will
 be treated as required. Here is an example:
 
+    @ConfigObject
     public interface MyConfig {
       /* a parameter named 'value1' */
       String getValue1();
@@ -38,14 +98,14 @@ This class could map the properties file (myconfig.properties):
     value1=My Configured Value
     intValue=88
 
-The developer would then create an `ItscoFactory` and create instances of MyConfig from it:
+The developer would then create a `ConfigObjectFactory` and create instances of MyConfig from it:
 
-    ItscoFactory<Configuration> configurationFactory = new ConfigurationItscoFactory();
+    ConfigObjectFactory confObjFactory = new DefaultConfigObjectFactory();
     Configuration config = new PropertiesConfiguration(new File("myconfig.properties"));
-    MyConfig myConfig = configurationFactory.create(config, MyConfig.class);
-    // alternatively, a function can be created
-    Function<Configuration, MyConfig> configFunction = configurationFactory.createGenerator(MyConfig.class);
-    MyConfig myConfig2 = configFunction.apply(config);
+    MyConfig myConfig = confObjFactory.create(config, MyConfig.class);
+    // alternatively, an instantiator can be created
+    Instantiator<MyConfig> configFunction = confObjFactory.createGenerator(MyConfig.class);
+    MyConfig myConfig2 = configFunction.instantiate(config);
 
     // prints "My Configured Value"
     System.out.println(myConfig.getValue1());
@@ -56,44 +116,8 @@ The developer would then create an `ItscoFactory` and create instances of MyConf
     // prints "42'
     System.out.println(myConfig.getIntValue());
 
-Use Cases
----------
-
-1. Application Configuration
-2. Communication Payloads (ex. body content for JAXRS)
-3. Object marshalling/unmarshalling for storage and payload - a combination of 1 & 2.
-
-###Use Case 1
-Ever application has some sort of configuration. This configuration is often don in many different ways -- properties
-files, ini files, xml files, json files, cli options, database tables, etc.  In the application, this configuration is
-often looked up with a simple string->string map or a custom parser is written.  As an app grows, one of two things
-happen: either
-
- 1. the configuration keys get dispersed all over the application, and knowing the full set or doing any sort of
-    analysis on the configuration becomes near-impossible OR
- 2. the configuration key s are all stored as constants in a single class, causing tight coupling snd circular semantic
-    dependencies
-
-Apache's commons-configuration has done a good job of abstracting the different methods of specification and making them
-available to the application programmer as a standard interface. However, it has done nothing to address the
-proliferation and coupling of configuration keys.
-
-###Use Case 2
-Applications that communicate:  think JAXRS - objects are POSTed and returns as structured text.  We often end up
-writing multitudes of custom parsing and marshalling. Existing automated marshallers rely heavily on setters - making
-these objects very mutable.  A message sent across the wire is not mutable, making this mutability merely an artifact
-of the framework. In addition, these objects can often benefit from the Builder pattern. However, a comprehensive
-builder can be verbose, rote, and full of boilerplate.  These things tend to require significant attention, or encourage
-a lack of functionality
-
-###Use Case 3
-You have a structure object that represents some process. Client A will submit using a json API, Client B will submit in
-xml, you submit to worker agents using java objects, you store the object in a RDBMS.  You need the same validation,
-structure, and type safety in all of these places.  Think of this as a sort of merging of 1 & 2 -
-"Communicated Configuration"
-
-Non-Obvious Needs
------------------
+Non-Obvious Needs / Future Work
+-------------------------------
 
 1. Field-type supporting exposing sets of properties as key/value pairs - used for supporting embedding configuration
    that will be passed to other libraries
@@ -105,32 +129,5 @@ Non-Obvious Needs
 4. Discoverability - shall be able to dynamically describe available configuration
 5. Listeners on configuration change - some configuration will be used to create other objects - when the configuration
    changes, these objects will need to be modified
-6. Schema generators - should be able to generate an xml schema, json schema, db schema, etc based on the itsco.
 7. Should support JSR-303 annotations on getters.
-
-Itsco Supporting Features
--------------------------
-
-Planned features, with supporting use cases
-
-* Build-time generated Builder class that allows copying
-    * (2) - instantiate for returning in APIs
-    * (3) - clients instantiate
-* Configuration-backed, runtime-generated, dynamic implementations
-    * (1) - load configs as objects and keep the objects up-to-date as the configuration changes
-* Runtime-generated unmarshalled implementation
-    * (2) - recreating objects on receiving side
-* Runtime-generated marshaller
-    * (2) - sending side object to stream conversion
-* Support config-keyed subclasses of itsco fields where parents don't need to know about the impls
-    * (1) - one key specifies an impl, each impl has its own configuration, impl can be plugins that are deployed with no
-          knowledge by the parent
-* Pluggable backing mechanisms
-    * (3) - user has custom format or DB Schema
-* Pluggable type conversions
-    * (1,2,3) - user has custom types that need to be supported
-* Support "valueOf" static methods
-* Support "Optional" type (from Guava)
-    * (1) - sometimes a default doesn't cut it - we want to know that it is unspecified
-* Support Collections (Map, List, Collection (list), Iterable (list), Set, SortedSet, NavigableSet, Multiset,
-                       Multimap, Table)
+8. Annotation processor for compile-time validation of `@ConfigObject`-annotated interfaces.
