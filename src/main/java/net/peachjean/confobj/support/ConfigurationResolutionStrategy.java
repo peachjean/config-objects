@@ -3,6 +3,8 @@ package net.peachjean.confobj.support;
 import org.apache.commons.configuration.Configuration;
 
 class ConfigurationResolutionStrategy implements FieldResolutionStrategy {
+    public static final ConfigurationResolutionStrategy INSTANCE = new ConfigurationResolutionStrategy();
+
     @Override
     public <T, C> T resolve(String name, Class<T> lookupType, Configuration context, C resolutionContext) {
         if(!this.supports(lookupType)) {

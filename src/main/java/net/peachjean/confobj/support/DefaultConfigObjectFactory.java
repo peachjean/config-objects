@@ -1,8 +1,12 @@
 package net.peachjean.confobj.support;
 
+import org.apache.commons.collections.ListUtils;
+import org.apache.commons.collections.list.UnmodifiableList;
 import org.apache.commons.configuration.Configuration;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -12,11 +16,7 @@ public class DefaultConfigObjectFactory implements ConfigObjectFactory {
 
     private final ImplementationGenerator implementationGenerator = new AsmImplementationGenerator();
 
-    private final List<FieldResolutionStrategy> strategies = Arrays.asList(
-            StringResolutionStrategy.INSTANCE,
-            ValueOfResolutionStrategy.INSTANCE,
-            new ConfigObjectResolutionStrategy(this)
-    );
+    private final List<FieldResolutionStrategy> strategies;
 
     private final SimpleCache<Class<?>, Instantiator<?>> instantiatorCache = SimpleCache.build(new SimpleCache.Loader<Class<?>, Instantiator<?>>() {
         @Override
@@ -25,7 +25,25 @@ public class DefaultConfigObjectFactory implements ConfigObjectFactory {
         }
     });
 
-    protected DefaultConfigObjectFactory() {
+    public DefaultConfigObjectFactory() {
+        this(Collections.<FieldResolutionStrategy>emptyList());
+    }
+
+    public DefaultConfigObjectFactory(FieldResolutionStrategy ... strategies) {
+        this(Arrays.asList(strategies));
+    }
+
+    public DefaultConfigObjectFactory(Iterable<FieldResolutionStrategy> strategies) {
+        List<FieldResolutionStrategy> strategyList = new ArrayList();
+        strategyList.add(StringResolutionStrategy.INSTANCE);
+        strategyList.add(ValueOfResolutionStrategy.INSTANCE);
+        strategyList.add(new ConfigObjectResolutionStrategy(this));
+        strategyList.add(ConfigurationResolutionStrategy.INSTANCE);
+        // add defaults above this comment
+        for(FieldResolutionStrategy strategy: strategies) {
+            strategyList.add(strategy);
+        }
+        this.strategies = UnmodifiableList.unmodifiableList(strategyList);
     }
 
     @Override
