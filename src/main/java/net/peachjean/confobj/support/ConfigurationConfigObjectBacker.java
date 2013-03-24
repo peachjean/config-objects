@@ -27,16 +27,15 @@ class ConfigurationConfigObjectBacker<I> implements ConfigObjectBacker<I> {
     }
 
     @Override
-    public <T> T lookup(final String name, final Class<T> lookupType) {
+    public <T> T lookup(final String name, final GenericType<T> lookupType) {
         this.validateState();
-        GenericType<T> type = new GenericType<T>(lookupType);
-        FieldResolutionStrategy resolutionStrategy = this.determineStrategy(type);
+        FieldResolutionStrategy resolutionStrategy = this.determineStrategy(lookupType);
         if (resolutionStrategy.isContextBacked()) {
             if (cachedValues.containsKey(name)) {
                 return lookupType.cast(cachedValues.get(name));
             }
         }
-        final T resolved = resolutionStrategy.resolve(name, type, context, containing);
+        final T resolved = resolutionStrategy.resolve(name, lookupType, context, containing);
         if (resolved == null) {
             throw new IllegalStateException("No value for " + name);
         }
@@ -47,11 +46,10 @@ class ConfigurationConfigObjectBacker<I> implements ConfigObjectBacker<I> {
     }
 
     @Override
-    public <T> T lookup(final String name, final Class<T> lookupType, final T defaultValue) {
+    public <T> T lookup(final String name, final GenericType<T> lookupType, final T defaultValue) {
         this.validateState();
-        GenericType<T> type = new GenericType<T>(lookupType);
-        FieldResolutionStrategy resolutionStrategy = this.determineStrategy(type);
-        final T resolved = resolutionStrategy.resolve(name, type, context, containing);
+        FieldResolutionStrategy resolutionStrategy = this.determineStrategy(lookupType);
+        final T resolved = resolutionStrategy.resolve(name, lookupType, context, containing);
         return resolved != null ? resolved : defaultValue;
     }
 

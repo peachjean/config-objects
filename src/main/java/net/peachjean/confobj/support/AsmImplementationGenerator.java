@@ -225,17 +225,19 @@ class AsmImplementationGenerator implements ImplementationGenerator {
         }
 
         private void createFieldMethod(ClassWriter cw, FieldModel field) {
+            String genericTypeSignature = Type.getDescriptor(GenericType.class);
+
             String returnType = Type.getDescriptor(field.primitiveType == null ? field.type : field.primitiveType);
             MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, field.methodName, "()" + returnType, null, null);
             mv.visitCode();
             mv.visitVarInsn(ALOAD, 0);
             mv.visitFieldInsn(GETFIELD, generateAsmImplName(), "backer", BACKER_TYPE.getDescriptor());
             mv.visitLdcInsn(field.name);
-            mv.visitLdcInsn(Type.getType(field.type));
+            instantiateGenericType(field, mv);
 
             if(field.required) {
                 // backer.lookup(String, Class)
-                mv.visitMethodInsn(INVOKEINTERFACE, BACKER_TYPE.getInternalName(), "lookup", "(Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/Object;");
+                mv.visitMethodInsn(INVOKEINTERFACE, BACKER_TYPE.getInternalName(), "lookup", "(Ljava/lang/String;" + genericTypeSignature + ")Ljava/lang/Object;");
             } else {
                 // super.getXXX()
                 mv.visitVarInsn(ALOAD, 0);
@@ -246,7 +248,7 @@ class AsmImplementationGenerator implements ImplementationGenerator {
                     mv.visitMethodInsn(INVOKESTATIC, Type.getInternalName(field.type), "valueOf", "(" + Type.getDescriptor(field.primitiveType) + ")" + Type.getDescriptor(field.type));
                 }
                 // backer.lookup(String, Class, T)
-                mv.visitMethodInsn(INVOKEINTERFACE, BACKER_TYPE.getInternalName(), "lookup", "(Ljava/lang/String;Ljava/lang/Class;Ljava/lang/Object;)Ljava/lang/Object;");
+                mv.visitMethodInsn(INVOKEINTERFACE, BACKER_TYPE.getInternalName(), "lookup", "(Ljava/lang/String;" + genericTypeSignature + "Ljava/lang/Object;)Ljava/lang/Object;");
             }
             mv.visitTypeInsn(CHECKCAST, Type.getInternalName(field.type));
 
@@ -259,6 +261,27 @@ class AsmImplementationGenerator implements ImplementationGenerator {
             }
             mv.visitMaxs(0, 0);
             mv.visitEnd();
+        }
+
+        private void instantiateGenericType(FieldModel field, MethodVisitor mv) {
+            instantiateGenericType(mv, field.genericType);
+        }
+
+        private void instantiateGenericType(MethodVisitor mv, GenericType genericType) {
+            mv.visitLdcInsn(Type.getType(genericType.getRawType()));
+            List<GenericType<?>> parameters = genericType.getParameters();
+            mv.visitIntInsn(BIPUSH, parameters.size());
+            mv.visitTypeInsn(ANEWARRAY, Type.getInternalName(GenericType.class));
+
+            int index = 0;
+            for(GenericType<?> parameter: parameters) {
+                mv.visitInsn(DUP);
+                mv.visitIntInsn(BIPUSH, index++);
+                instantiateGenericType(mv, parameter);
+                mv.visitInsn(AASTORE);
+            }
+            String gtSig = Type.getDescriptor(GenericType.class);
+            mv.visitMethodInsn(INVOKESTATIC, Type.getInternalName(GenericType.class), "forTypeWithParams", "(Ljava/lang/Class;[" + gtSig + ")" + gtSig);
         }
 
         private int getReturnType(Class type) {
@@ -359,20 +382,23 @@ class AsmImplementationGenerator implements ImplementationGenerator {
 
     private static class FieldModel {
         public final String methodName;
+        public final GenericType genericType;
         public final Class type;
         public final String name;
         public final boolean required;
         public final Class primitiveType;
 
-        private FieldModel(String methodName, Class type, String name, boolean required) {
+        private FieldModel(String methodName, GenericType type, String name, boolean required) {
             this.methodName = methodName;
             this.name = name;
             this.required = required;
-            if(type.isPrimitive()) {
-                this.type = ClassUtils.primitiveToWrapper(type);
-                this.primitiveType = type;
+            if(type.getRawType().isPrimitive()) {
+                this.type = ClassUtils.primitiveToWrapper(type.getRawType());
+                this.primitiveType = type.getRawType();
+                this.genericType = GenericType.forType(this.type);
             } else {
-                this.type = type;
+                this.type = type.getRawType();
+                this.genericType = type;
                 this.primitiveType = null;
             }
         }
@@ -561,17 +587,17 @@ class AsmImplementationGenerator implements ImplementationGenerator {
     private class AsmVisitor<T> implements ConfigObjectVisitor<T,ConfObjModel<T>> {//
 //        @Override
         public <P> void visitSimple(String name, Method method, GenericType<P> propertyType, boolean required, ConfObjModel<T> input) {
-            input.fields.add(new FieldModel(method.getName(), propertyType.getRawType(), name, required));
+            input.fields.add(new FieldModel(method.getName(), propertyType, name, required));
         }
 
 //        @Override
         public <P> void visitConfigObject(String name, Method method, GenericType<P> propertyType, boolean required, ConfObjModel<T> input) {
-            input.fields.add(new FieldModel(method.getName(), propertyType.getRawType(), name, required));
+            input.fields.add(new FieldModel(method.getName(), propertyType, name, required));
         }
 
 //        @Override
         public <P> void visitPrimitive(String name, Method method, Class<P> propertyType, boolean required, ConfObjModel<T> input) {
-            input.fields.add(new FieldModel(method.getName(), propertyType, name, required));
+            input.fields.add(new FieldModel(method.getName(), GenericType.forType(propertyType), name, required));
         }
 
 //        @Override

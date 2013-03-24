@@ -1,5 +1,6 @@
 package net.peachjean.confobj.support.example.shared;
 
+import net.peachjean.confobj.introspection.GenericType;
 import net.peachjean.confobj.support.ConfigObjectBacker;
 
 public class DependentConfigObjectImplExample extends DependentConfigObject.Defaults {
@@ -13,6 +14,6 @@ public class DependentConfigObjectImplExample extends DependentConfigObject.Defa
 
     @Override
     public String getPath() {
-        return backer.lookup("path", String.class, super.getPath());
+        return backer.lookup("path", GenericType.forType(String.class), super.getPath());
     }
 }

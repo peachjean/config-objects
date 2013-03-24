@@ -134,4 +134,8 @@ public class GenericType<T> {
         }
         return retVal;
     }
+
+    public static <T, R extends T> GenericType<T> forTypeWithParams(Class<R> type, GenericType<?> ... params) {
+        return new GenericType<T>(type, params);
+    }
 }

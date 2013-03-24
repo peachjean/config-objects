@@ -1,14 +1,11 @@
 package net.peachjean.confobj.support.example;
 
+import net.peachjean.confobj.introspection.GenericType;
 import net.peachjean.confobj.support.ConfigObjectBacker;
 
 public class ExampleConfigObjectImpl extends ExampleConfigObject.Defaults implements ExampleConfigObject {
 
     private final ConfigObjectBacker<ExampleConfigObject> backer;
-
-    private String value1;
-    private String value2;
-    private Integer intValue;
 
     public ExampleConfigObjectImpl(final ConfigObjectBacker<ExampleConfigObject> backer) {
         this.backer = backer;
@@ -16,17 +13,17 @@ public class ExampleConfigObjectImpl extends ExampleConfigObject.Defaults implem
     }
 
     public String getValue1() {
-        return backer.lookup("value1", String.class);
+        return backer.lookup("value1", GenericType.forType(String.class));
     }
 
     @Override
     public String getValue2() {
-        return backer.lookup("value2", String.class, super.getValue2());
+        return backer.lookup("value2", GenericType.forType(String.class), super.getValue2());
     }
 
     @Override
     public Integer getIntValue() {
-        return backer.lookup("intValue", Integer.class, super.getIntValue());
+        return backer.lookup("intValue", GenericType.forType(Integer.class), super.getIntValue());
     }
 
     @Override
