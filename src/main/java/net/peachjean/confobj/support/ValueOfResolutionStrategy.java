@@ -11,7 +11,7 @@ class ValueOfResolutionStrategy implements FieldResolutionStrategy {
     public static final ValueOfResolutionStrategy INSTANCE = new ValueOfResolutionStrategy();
 
     @Override
-    public <T, C> T resolve(final String name, final Class<T> lookupType, final Configuration config, final C resolutionContext) {
+    public <T, C> T resolve(final String name, final GenericType<T> lookupType, final Configuration config, final C resolutionContext) {
 
         if (config.containsKey(name)) {
             return getAndReturn(name, lookupType, config);
@@ -20,12 +20,12 @@ class ValueOfResolutionStrategy implements FieldResolutionStrategy {
         }
     }
 
-    private <T, C> T getAndReturn(final String name, final Class<T> lookupType, Configuration config) {
+    private <T, C> T getAndReturn(final String name, final GenericType<T> lookupType, Configuration config) {
         String value = config.getString(name);
         try {
-            Method m = lookupMethod(lookupType);
+            Method m = lookupMethod(lookupType.getRawType());
             if (m == null) {
-                throw new IllegalArgumentException("Class " + lookupType.getName() + " does not have a valueOf method.");
+                throw new IllegalArgumentException("Class " + lookupType.getRawType().getName() + " does not have a valueOf method.");
             }
             return lookupType.cast(m.invoke(null, value));
         } catch (InvocationTargetException e) {
@@ -49,8 +49,8 @@ class ValueOfResolutionStrategy implements FieldResolutionStrategy {
     }
 
     @Override
-    public boolean supports(final Class<?> lookupType) {
-        return lookupMethod(lookupType) != null;
+    public boolean supports(final GenericType<?> lookupType) {
+        return lookupMethod(lookupType.getRawType()) != null;
     }
 
     @Override

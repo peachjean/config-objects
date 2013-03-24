@@ -61,6 +61,10 @@ public class GenericType<T> {
         }
     }
 
+    public T cast(Object o) {
+        return this.rawType.cast(o);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -9,9 +9,9 @@ public interface FieldResolutionStrategy {
      *
      * @throws IllegalArgumentException if an unsupported lookupType is passed
      */
-    <T, C> T resolve(String name, Class<T> lookupType, Configuration context, C resolutionContext);
+    <T, C> T resolve(String name, GenericType<T> type, Configuration context, C resolutionContext);
 
-    boolean supports(Class<?> lookupType);
+    boolean supports(GenericType<?> lookupType);
 
     /**
      * If this method returns {@code true} then any object returned by {@link #resolve} will change dynamically as the

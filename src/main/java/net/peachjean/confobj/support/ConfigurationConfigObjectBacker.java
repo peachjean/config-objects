@@ -28,13 +28,14 @@ class ConfigurationConfigObjectBacker<I> implements ConfigObjectBacker<I> {
     @Override
     public <T> T lookup(final String name, final Class<T> lookupType) {
         this.validateState();
-        FieldResolutionStrategy resolutionStrategy = this.determineStrategy(lookupType);
+        GenericType<T> type = new GenericType<T>(lookupType);
+        FieldResolutionStrategy resolutionStrategy = this.determineStrategy(type);
         if (resolutionStrategy.isContextBacked()) {
             if (cachedValues.containsKey(name)) {
                 return lookupType.cast(cachedValues.get(name));
             }
         }
-        final T resolved = resolutionStrategy.resolve(name, lookupType, context, containing);
+        final T resolved = resolutionStrategy.resolve(name, type, context, containing);
         if (resolved == null) {
             throw new IllegalStateException("No value for " + name);
         }
@@ -47,8 +48,9 @@ class ConfigurationConfigObjectBacker<I> implements ConfigObjectBacker<I> {
     @Override
     public <T> T lookup(final String name, final Class<T> lookupType, final T defaultValue) {
         this.validateState();
-        FieldResolutionStrategy resolutionStrategy = this.determineStrategy(lookupType);
-        final T resolved = resolutionStrategy.resolve(name, lookupType, context, containing);
+        GenericType<T> type = new GenericType<T>(lookupType);
+        FieldResolutionStrategy resolutionStrategy = this.determineStrategy(type);
+        final T resolved = resolutionStrategy.resolve(name, type, context, containing);
         return resolved != null ? resolved : defaultValue;
     }
 
@@ -58,12 +60,12 @@ class ConfigurationConfigObjectBacker<I> implements ConfigObjectBacker<I> {
         }
     }
 
-    protected <T> FieldResolutionStrategy determineStrategy(final Class<T> lookupType) {
+    protected <T> FieldResolutionStrategy determineStrategy(final GenericType<T> lookupType) {
         for (FieldResolutionStrategy strategy : strategies) {
             if (strategy.supports(lookupType)) {
                 return strategy;
             }
         }
-        throw new IllegalStateException("No strategy to support type " + lookupType.getName());
+        throw new IllegalStateException("No strategy to support type " + lookupType.getRawType().getName());
     }
 }
