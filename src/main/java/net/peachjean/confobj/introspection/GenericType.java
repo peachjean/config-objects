@@ -1,4 +1,4 @@
-package net.peachjean.confobj.support;
+package net.peachjean.confobj.introspection;
 
 import org.apache.commons.lang3.Validate;
 

@@ -28,11 +28,11 @@ public class ConfigObjectIntrospector {
                     continue;
                 }
                 if (isConfigObject(p.getPropertyType())) {
-                    visitor.visitConfigObject(p.getName(), p.getReadMethod(), p.getPropertyType(), isRequired(confObjType, p.getReadMethod()), input);
+                    visitor.visitConfigObject(p.getName(), p.getReadMethod(), GenericType.forType(p.getReadMethod().getGenericReturnType()), isRequired(confObjType, p.getReadMethod()), input);
                 } else if (p.getPropertyType().isPrimitive()) {
                     visitor.visitPrimitive(p.getName(), p.getReadMethod(), p.getPropertyType(), isRequired(confObjType, p.getReadMethod()), input);
                 } else {
-                    visitor.visitSimple(p.getName(), p.getReadMethod(), p.getPropertyType(), isRequired(confObjType, p.getReadMethod()), input);
+                    visitor.visitSimple(p.getName(), p.getReadMethod(), GenericType.forType(p.getReadMethod().getGenericReturnType()), isRequired(confObjType, p.getReadMethod()), input);
                 }
             }
         } catch (IntrospectionException e) {

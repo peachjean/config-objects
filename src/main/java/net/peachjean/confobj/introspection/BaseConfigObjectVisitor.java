@@ -9,12 +9,12 @@ import java.lang.reflect.Method;
  */
 public class BaseConfigObjectVisitor<T, I> implements ConfigObjectVisitor<T, I> {
     @Override
-    public <P> void visitSimple(String name, Method method, Class<P> propertyType, boolean required, I input) {
+    public <P> void visitSimple(String name, Method method, GenericType<P> propertyType, boolean required, I input) {
         // do nothing
     }
 
     @Override
-    public <P> void visitConfigObject(String name, Method method, Class<P> propertyType, boolean required, I input) {
+    public <P> void visitConfigObject(String name, Method method, GenericType<P> propertyType, boolean required, I input) {
         // do nothing
     }
 

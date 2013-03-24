@@ -1,5 +1,6 @@
 package net.peachjean.confobj.support;
 
+import net.peachjean.confobj.introspection.GenericType;
 import org.junit.Test;
 
 import java.util.Arrays;

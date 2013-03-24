@@ -1,5 +1,6 @@
 package net.peachjean.confobj.support;
 
+import net.peachjean.confobj.introspection.GenericType;
 import org.apache.commons.configuration.Configuration;
 
 public interface FieldResolutionStrategy {

@@ -2,6 +2,7 @@ package net.peachjean.confobj.support;
 
 import net.peachjean.confobj.introspection.ConfigObjectIntrospector;
 import net.peachjean.confobj.introspection.ConfigObjectVisitor;
+import net.peachjean.confobj.introspection.GenericType;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.objectweb.asm.*;
@@ -559,13 +560,13 @@ class AsmImplementationGenerator implements ImplementationGenerator {
 
     private class AsmVisitor<T> implements ConfigObjectVisitor<T,ConfObjModel<T>> {//
 //        @Override
-        public <P> void visitSimple(String name, Method method, Class<P> propertyType, boolean required, ConfObjModel<T> input) {
-            input.fields.add(new FieldModel(method.getName(), propertyType, name, required));
+        public <P> void visitSimple(String name, Method method, GenericType<P> propertyType, boolean required, ConfObjModel<T> input) {
+            input.fields.add(new FieldModel(method.getName(), propertyType.getRawType(), name, required));
         }
 
 //        @Override
-        public <P> void visitConfigObject(String name, Method method, Class<P> propertyType, boolean required, ConfObjModel<T> input) {
-            input.fields.add(new FieldModel(method.getName(), propertyType, name, required));
+        public <P> void visitConfigObject(String name, Method method, GenericType<P> propertyType, boolean required, ConfObjModel<T> input) {
+            input.fields.add(new FieldModel(method.getName(), propertyType.getRawType(), name, required));
         }
 
 //        @Override

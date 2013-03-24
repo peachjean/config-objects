@@ -1,5 +1,7 @@
 package net.peachjean.confobj.support;
 
+import net.peachjean.confobj.introspection.GenericType;
+
 import javax.inject.Qualifier;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;

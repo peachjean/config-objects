@@ -1,5 +1,7 @@
 package net.peachjean.confobj.support;
 
+import net.peachjean.confobj.introspection.GenericType;
+
 import java.lang.annotation.Annotation;
 
 public interface InstantiationContext {

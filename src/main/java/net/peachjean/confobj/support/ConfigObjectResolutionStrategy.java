@@ -1,6 +1,7 @@
 package net.peachjean.confobj.support;
 
 import net.peachjean.confobj.ConfigObject;
+import net.peachjean.confobj.introspection.GenericType;
 import org.apache.commons.configuration.Configuration;
 
 class ConfigObjectResolutionStrategy implements FieldResolutionStrategy {

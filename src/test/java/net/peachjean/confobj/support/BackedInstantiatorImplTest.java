@@ -1,5 +1,6 @@
 package net.peachjean.confobj.support;
 
+import net.peachjean.confobj.introspection.GenericType;
 import net.peachjean.tater.utils.AnnotationInvocationHandler;
 import org.easymock.EasyMock;
 import org.junit.Test;
