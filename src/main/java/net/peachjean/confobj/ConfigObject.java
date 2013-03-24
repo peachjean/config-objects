@@ -15,8 +15,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * Defaults
  * <p/>
  * The interface may optionally have an abstract inner static class that implements this interface, and implements
- * any methods that should have default values.  This class should be named "Defaults".  As an alternative,
- * {@link Defaults} may be specified on the interface to bind a defaults class
+ * any methods that should have default values.  This class should be named "Defaults".
  */
 @Retention(RUNTIME)
 @Target(TYPE)
