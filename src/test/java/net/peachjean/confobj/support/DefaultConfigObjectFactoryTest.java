@@ -2,6 +2,7 @@ package net.peachjean.confobj.support;
 
 import net.peachjean.confobj.support.example.CompoundConfigObject;
 import net.peachjean.confobj.support.example.ExampleConfigObject;
+import net.peachjean.confobj.support.example.GenericConfigObject;
 import net.peachjean.confobj.support.example.shared.MasterConfigObject;
 import org.apache.bval.jsr303.ApacheValidationProvider;
 import org.apache.commons.configuration.BaseConfiguration;
@@ -11,6 +12,7 @@ import org.junit.Test;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
+import java.util.Arrays;
 import java.util.Set;
 
 import static org.junit.Assert.*;
@@ -120,4 +122,33 @@ public class DefaultConfigObjectFactoryTest {
         assertEquals(67, masterConfigObject.getShared().getMaxSize().intValue());
         assertEquals("myNamespace/myFile", masterConfigObject.getDependent().getPath());
     }
+
+    @Test
+    public void genericsListExample() {
+        Configuration config = new BaseConfiguration();
+        config.setProperty("string", "late late show");
+        config.setProperty("allStrings", "first,second,third");
+
+        ConfigObjectFactory factory = new DefaultConfigObjectFactory();
+        GenericConfigObject obj = factory.create(config, GenericConfigObject.class);
+
+        assertEquals("late late show", obj.getString());
+        assertEquals(Arrays.asList("first", "second", "third"), obj.getAllStrings());
+    }
+
+    @Test
+    public void genericsIndexedListExample() {
+        Configuration config = new BaseConfiguration();
+        config.setProperty("string", "late late show");
+        config.setProperty("allStrings(0)", "first");
+        config.setProperty("allStrings(1)", "second");
+        config.setProperty("allStrings(2)", "third");
+
+        ConfigObjectFactory factory = new DefaultConfigObjectFactory();
+        GenericConfigObject obj = factory.create(config, GenericConfigObject.class);
+
+        assertEquals("late late show", obj.getString());
+        assertEquals(Arrays.asList("first", "second", "third"), obj.getAllStrings());
+    }
+
 }

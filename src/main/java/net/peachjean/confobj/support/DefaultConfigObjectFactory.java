@@ -1,6 +1,6 @@
 package net.peachjean.confobj.support;
 
-import org.apache.commons.collections.ListUtils;
+import net.peachjean.confobj.introspection.GenericType;
 import org.apache.commons.collections.list.UnmodifiableList;
 import org.apache.commons.configuration.Configuration;
 
@@ -17,6 +17,18 @@ public class DefaultConfigObjectFactory implements ConfigObjectFactory {
     private final ImplementationGenerator implementationGenerator = new AsmImplementationGenerator();
 
     private final List<FieldResolutionStrategy> strategies;
+
+    private final FieldResolutionStrategy.Determiner strategyDeterminer =  new FieldResolutionStrategy.Determiner() {
+        @Override
+        public FieldResolutionStrategy determineStrategy(GenericType<?> type) {
+            for (FieldResolutionStrategy strategy : strategies) {
+                if (strategy.supports(type)) {
+                    return strategy;
+                }
+            }
+            throw new IllegalStateException("No strategy to support type " + type.getRawType().getName());
+        }
+    };
 
     private final SimpleCache<Class<?>, Instantiator<?>> instantiatorCache = SimpleCache.build(new SimpleCache.Loader<Class<?>, Instantiator<?>>() {
         @Override
@@ -39,9 +51,15 @@ public class DefaultConfigObjectFactory implements ConfigObjectFactory {
         strategyList.add(ValueOfResolutionStrategy.INSTANCE);
         strategyList.add(new ConfigObjectResolutionStrategy(this));
         strategyList.add(ConfigurationResolutionStrategy.INSTANCE);
+        strategyList.add(new ListResolutionStrategy());
         // add defaults above this comment
         for(FieldResolutionStrategy strategy: strategies) {
             strategyList.add(strategy);
+        }
+        for(FieldResolutionStrategy strategy: strategyList) {
+            if(strategy instanceof FieldResolutionStrategy.RequiresDeterminer) {
+                ((FieldResolutionStrategy.RequiresDeterminer)strategy).setDeterminer(this.strategyDeterminer);
+            }
         }
         this.strategies = UnmodifiableList.unmodifiableList(strategyList);
     }
@@ -90,7 +108,7 @@ public class DefaultConfigObjectFactory implements ConfigObjectFactory {
             }
 
             private <T> ConfigObjectBacker createBacker(final Configuration context) {
-                return new ConfigurationConfigObjectBacker(context, strategies);
+                return new ConfigurationConfigObjectBacker(context, strategyDeterminer);
             }
         };
     }

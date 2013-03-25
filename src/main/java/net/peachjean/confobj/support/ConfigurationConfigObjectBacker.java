@@ -12,12 +12,12 @@ class ConfigurationConfigObjectBacker<I> implements ConfigObjectBacker<I> {
     // don't want to recreate them on every get call
     private final Map<String, Object> cachedValues;
     private final Configuration context;
-    private final Iterable<FieldResolutionStrategy> strategies;
+    private final FieldResolutionStrategy.Determiner strategyDeterminer;
     private I containing;
 
-    public ConfigurationConfigObjectBacker(Configuration context, Iterable<FieldResolutionStrategy> strategies) {
+    public ConfigurationConfigObjectBacker(Configuration context, FieldResolutionStrategy.Determiner strategyDeterminer) {
         this.context = context;
-        this.strategies = strategies;
+        this.strategyDeterminer = strategyDeterminer;
         cachedValues = new HashMap<String, Object>();
     }
 
@@ -60,11 +60,6 @@ class ConfigurationConfigObjectBacker<I> implements ConfigObjectBacker<I> {
     }
 
     protected <T> FieldResolutionStrategy determineStrategy(final GenericType<T> lookupType) {
-        for (FieldResolutionStrategy strategy : strategies) {
-            if (strategy.supports(lookupType)) {
-                return strategy;
-            }
-        }
-        throw new IllegalStateException("No strategy to support type " + lookupType.getRawType().getName());
+        return this.strategyDeterminer.determineStrategy(lookupType);
     }
 }

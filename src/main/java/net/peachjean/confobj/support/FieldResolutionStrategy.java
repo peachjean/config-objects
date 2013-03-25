@@ -23,4 +23,12 @@ public interface FieldResolutionStrategy {
      * @return
      */
     boolean isContextBacked();
+
+    static interface Determiner {
+        FieldResolutionStrategy determineStrategy(GenericType<?> type);
+    }
+
+    static interface RequiresDeterminer {
+        void setDeterminer(Determiner determiner);
+    }
 }
