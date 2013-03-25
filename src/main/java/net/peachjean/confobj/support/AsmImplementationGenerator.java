@@ -6,10 +6,10 @@ import net.peachjean.confobj.introspection.GenericType;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.objectweb.asm.*;
+import org.objectweb.asm.Type;
+import org.objectweb.asm.signature.SignatureWriter;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -228,7 +228,8 @@ class AsmImplementationGenerator implements ImplementationGenerator {
             String genericTypeSignature = Type.getDescriptor(GenericType.class);
 
             String returnType = Type.getDescriptor(field.primitiveType == null ? field.type : field.primitiveType);
-            MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, field.methodName, "()" + returnType, null, null);
+            String signature = field.primitiveType == null ? generateGetterSignature(field.genericType) : null; // we don't care about signature if return type is primitive
+            MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, field.methodName, "()" + returnType, signature, null);
             mv.visitCode();
             mv.visitVarInsn(ALOAD, 0);
             mv.visitFieldInsn(GETFIELD, generateAsmImplName(), "backer", BACKER_TYPE.getDescriptor());
@@ -261,6 +262,40 @@ class AsmImplementationGenerator implements ImplementationGenerator {
             }
             mv.visitMaxs(0, 0);
             mv.visitEnd();
+        }
+
+        private String generateConstructorSignature(GenericType ... parameterTypes) {
+            SignatureWriter sw = new SignatureWriter();
+            sw.visitParameterType();
+            sw.visitClassType(Type.getInternalName(ConfigObjectBacker.class));
+            sw.visitEnd();
+            for(GenericType parameterType: parameterTypes) {
+                sw.visitParameterType();
+                generateGenericTypeSignature(sw, parameterType);
+                sw.visitEnd();
+            }
+            sw.visitReturnType();
+            sw.visitBaseType('V');
+            sw.visitEnd();
+            return sw.toString();
+        }
+        private String generateGetterSignature(GenericType genericType) {
+            SignatureWriter sw = new SignatureWriter();
+            sw.visitReturnType();
+            generateGenericTypeSignature(sw, genericType);
+            sw.visitEnd();
+            return sw.toString();
+        }
+
+        private void generateGenericTypeSignature(SignatureWriter sw, GenericType<?> genericType) {
+            sw.visitClassType(Type.getInternalName(genericType.getRawType()));
+            if(!genericType.getParameters().isEmpty()) {
+                sw.visitTypeArgument('=');
+                for(GenericType<?> parameter: genericType.getParameters()) {
+                    generateGenericTypeSignature(sw, parameter);
+                }
+                sw.visitEnd();
+            }
         }
 
         private void instantiateGenericType(FieldModel field, MethodVisitor mv) {
@@ -310,7 +345,8 @@ class AsmImplementationGenerator implements ImplementationGenerator {
                 sb.append(constructorArg.getDescriptor());
             }
             sb.append(")V");
-            MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "<init>", sb.toString(), null, null);
+            String signature = generateConstructorSignature(GenericType.forTypes(getDefaultsConstructor().getGenericParameterTypes()));
+            MethodVisitor mv = cw.visitMethod(ACC_PUBLIC, "<init>", sb.toString(), signature, null);
             mv.visitCode();
             // super(x, y, z)
             mv.visitVarInsn(ALOAD, 0);

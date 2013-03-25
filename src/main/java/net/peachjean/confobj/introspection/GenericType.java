@@ -121,13 +121,13 @@ public class GenericType<T> {
             return new GenericType((Class)type);
         } else if(type instanceof ParameterizedType) {
             ParameterizedType parameterizedType = (ParameterizedType) type;
-            return new GenericType<T>((Class<T>) parameterizedType.getRawType(), forType(parameterizedType.getActualTypeArguments()));
+            return new GenericType<T>((Class<T>) parameterizedType.getRawType(), forTypes(parameterizedType.getActualTypeArguments()));
         } else {
             throw new IllegalArgumentException("Could not generate GenericType for " + type);
         }
     }
 
-    private static GenericType[] forType(Type[] actualTypeArguments) {
+    public static GenericType[] forTypes(Type[] actualTypeArguments) {
         GenericType[] retVal = new GenericType[actualTypeArguments.length];
         for(int i = 0; i < actualTypeArguments.length; i++) {
             retVal[i] = forType(actualTypeArguments[i]);

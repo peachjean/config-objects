@@ -38,5 +38,9 @@ public class AsmImplementationGeneratorTest extends AbstractImplementationGenera
             GenericType<List> gtListString = GenericType.forTypeWithParams(List.class, GenericType.forTypeWithParams(String.class));
 
         }
+
+        public List<String> getLimits() {
+            return null;
+        }
     }
 }

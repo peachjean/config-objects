@@ -2,6 +2,7 @@ package net.peachjean.confobj.support;
 
 import net.peachjean.confobj.support.example.CompoundConfigObject;
 import net.peachjean.confobj.support.example.ExampleConfigObject;
+import net.peachjean.confobj.support.example.GenericCompound;
 import net.peachjean.confobj.support.example.GenericConfigObject;
 import net.peachjean.confobj.support.example.shared.MasterConfigObject;
 import org.apache.bval.jsr303.ApacheValidationProvider;
@@ -151,4 +152,16 @@ public class DefaultConfigObjectFactoryTest {
         assertEquals(Arrays.asList("first", "second", "third"), obj.getAllStrings());
     }
 
+    @Test
+    public void genericInjectedCompoundsExample() {
+        Configuration config = new BaseConfiguration();
+        config.setProperty("roles", "first, second, third");
+        config.setProperty("limits", "1, 2, 3, 4");
+
+        ConfigObjectFactory factory = new DefaultConfigObjectFactory();
+        GenericCompound obj = factory.create(config, GenericCompound.class);
+
+        assertEquals("first,second,third", obj.getChild().getCombinedRoles());
+        assertEquals(10, obj.getChild().getMaxLimit().intValue());
+    }
 }
