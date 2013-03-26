@@ -9,7 +9,31 @@
     <version>0.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Config Objects</name>
-    <description>Config Objects</description>
+    <description>
+        Config Objects - a framework for dynamically implementing "config object" interfaces that are backed by
+        commons-configuration Configuration objects.
+    </description>
+    <url>https://bitbucket.org/peachjean/config-objects</url>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <scm>
+        <url>https://bitbucket.org/peachjean/config-objects</url>
+        <connection>scm:hg:ssh://hg@bitbucket.org/peachjean/config-objects</connection>
+        <developerConnection>scm:hg:ssh://hg@bitbucket.org/peachjean/config-objects</developerConnection>
+    </scm>
+    <developers>
+        <developer>
+            <name>Jared Bunting</name>
+            <email>jared.bunting@peachjean.com</email>
+            <organization>PeachJean Solutions</organization>
+            <timezone>-6</timezone>
+        </developer>
+    </developers>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
