@@ -1,13 +1,13 @@
 package net.peachjean.confobj.support;
 
 import net.peachjean.commons.test.junit.TmpDir;
-import net.peachjean.commons.test.testng.Rule;
 import net.peachjean.confobj.introspection.GenericType;
 import org.apache.commons.configuration.BaseConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.io.FileUtils;
+import org.junit.Rule;
 import org.junit.Test;
 
 import java.io.File;
@@ -20,7 +20,7 @@ import static org.junit.Assert.assertEquals;
 public class ListResolutionStrategyTest {
 
     @Rule
-    public final TmpDir tmpDir = new TmpDir();
+    public TmpDir tmpDir = new TmpDir();
 
     @Test
     public void test() {
