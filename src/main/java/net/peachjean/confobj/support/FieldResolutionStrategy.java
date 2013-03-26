@@ -25,6 +25,8 @@ public interface FieldResolutionStrategy {
     boolean isContextBacked();
 
     static interface Determiner {
+        boolean isStrategyAvailable(GenericType<?> type);
+
         FieldResolutionStrategy determineStrategy(GenericType<?> type);
     }
 

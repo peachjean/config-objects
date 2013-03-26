@@ -19,7 +19,8 @@ class ListResolutionStrategy implements FieldResolutionStrategy, FieldResolution
 
     @Override
     public boolean supports(GenericType<?> lookupType) {
-        return lookupType.getRawType().isAssignableFrom(List.class);
+        return lookupType.getRawType().isAssignableFrom(List.class) && lookupType.getParameters().size() == 1 &&
+                determiner.isStrategyAvailable(lookupType.getParameters().get(0));
     }
 
     @Override

@@ -21,12 +21,26 @@ public class DefaultConfigObjectFactory implements ConfigObjectFactory {
     private final FieldResolutionStrategy.Determiner strategyDeterminer =  new FieldResolutionStrategy.Determiner() {
         @Override
         public FieldResolutionStrategy determineStrategy(GenericType<?> type) {
+            FieldResolutionStrategy frs = this.findStrategy(type);
+            if(frs == null) {
+                throw new IllegalStateException("No strategy to support type " + type.getRawType().getName());
+            } else {
+                return frs;
+            }
+        }
+
+        @Override
+        public boolean isStrategyAvailable(GenericType<?> type) {
+            return this.findStrategy(type) != null;
+        }
+
+        private FieldResolutionStrategy findStrategy(GenericType<?> type) {
             for (FieldResolutionStrategy strategy : strategies) {
                 if (strategy.supports(type)) {
                     return strategy;
                 }
             }
-            throw new IllegalStateException("No strategy to support type " + type.getRawType().getName());
+            return null;
         }
     };
 
@@ -53,6 +67,7 @@ public class DefaultConfigObjectFactory implements ConfigObjectFactory {
         strategyList.add(ConfigurationResolutionStrategy.INSTANCE);
         strategyList.add(new ListResolutionStrategy());
         strategyList.add(new SetResolutionStrategy());
+        strategyList.add(new MapResolutionStrategy());
         // add defaults above this comment
         for(FieldResolutionStrategy strategy: strategies) {
             strategyList.add(strategy);

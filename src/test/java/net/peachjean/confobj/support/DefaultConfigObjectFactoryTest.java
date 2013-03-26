@@ -13,10 +13,7 @@ import org.junit.Test;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -149,6 +146,9 @@ public class DefaultConfigObjectFactoryTest {
         config.addProperty("stringSet", "alpha");
         config.addProperty("stringSet", "bravo");
         config.addProperty("stringSet", "charlie");
+        config.addProperty("numberMap.everything", "42");
+        config.addProperty("numberMap.timesTwo", "84");
+        config.addProperty("numberMap.reallyThatsPi", "3");
 
         ConfigObjectFactory factory = new DefaultConfigObjectFactory();
         GenericConfigObject obj = factory.create(config, GenericConfigObject.class);
@@ -156,11 +156,21 @@ public class DefaultConfigObjectFactoryTest {
         assertEquals("late late show", obj.getString());
         assertEquals(Arrays.asList("first", "second", "third"), obj.getAllStrings());
         assertEquals(new HashSet<String>(Arrays.asList("alpha", "bravo", "charlie")), obj.getStringSet());
+        Map<String, Integer> expectedMap = new HashMap<String, Integer>();
+        expectedMap.put("everything", 42);
+        expectedMap.put("timesTwo", 84);
+        expectedMap.put("reallyThatsPi", 3);
+        assertEquals(expectedMap, obj.getNumberMap());
 
         config.clearProperty("allStrings(2)");
         config.setProperty("stringSet", "omega");
+        config.clearProperty("numberMap.reallyThatsPi");
         assertEquals(Arrays.asList("first", "second"), obj.getAllStrings());
         assertEquals(Collections.singleton("omega"), obj.getStringSet());
+        Map<String, Integer> changedExpectedMap = new HashMap<String, Integer>();
+        changedExpectedMap.put("everything", 42);
+        changedExpectedMap.put("timesTwo", 84);
+        assertEquals(changedExpectedMap, obj.getNumberMap());
     }
 
     @Test

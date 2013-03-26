@@ -20,7 +20,8 @@ class SetResolutionStrategy implements FieldResolutionStrategy, FieldResolutionS
 
     @Override
     public boolean supports(GenericType<?> lookupType) {
-        return lookupType.getRawType().equals(Set.class);
+        return lookupType.getRawType().equals(Set.class) && lookupType.getParameters().size() == 1 &&
+                determiner.isStrategyAvailable(lookupType.getParameters().get(0));
     }
 
     @Override

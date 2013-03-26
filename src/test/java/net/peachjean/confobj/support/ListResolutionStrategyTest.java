@@ -32,6 +32,11 @@ public class ListResolutionStrategyTest {
         ListResolutionStrategy lrs = new ListResolutionStrategy();
         lrs.setDeterminer(new FieldResolutionStrategy.Determiner() {
             @Override
+            public boolean isStrategyAvailable(GenericType<?> type) {
+                return type.getRawType().equals(String.class);
+            }
+
+            @Override
             public FieldResolutionStrategy determineStrategy(GenericType<?> type) {
                 return new StringResolutionStrategy();
             }
@@ -57,6 +62,11 @@ public class ListResolutionStrategyTest {
 
         ListResolutionStrategy lrs = new ListResolutionStrategy();
         lrs.setDeterminer(new FieldResolutionStrategy.Determiner() {
+            @Override
+            public boolean isStrategyAvailable(GenericType<?> type) {
+                return type.getRawType().equals(String.class);
+            }
+
             @Override
             public FieldResolutionStrategy determineStrategy(GenericType<?> type) {
                 return new StringResolutionStrategy();
