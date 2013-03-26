@@ -52,6 +52,7 @@ public class DefaultConfigObjectFactory implements ConfigObjectFactory {
         strategyList.add(new ConfigObjectResolutionStrategy(this));
         strategyList.add(ConfigurationResolutionStrategy.INSTANCE);
         strategyList.add(new ListResolutionStrategy());
+        strategyList.add(new SetResolutionStrategy());
         // add defaults above this comment
         for(FieldResolutionStrategy strategy: strategies) {
             strategyList.add(strategy);

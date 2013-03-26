@@ -2,8 +2,6 @@ package net.peachjean.confobj.support;
 
 import net.peachjean.confobj.introspection.GenericType;
 import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationUtils;
-import org.apache.commons.configuration.HierarchicalConfiguration;
 
 import java.util.AbstractList;
 import java.util.List;
@@ -14,10 +12,9 @@ class ListResolutionStrategy implements FieldResolutionStrategy, FieldResolution
 
     @Override
     public <T, C> T resolve(String name, GenericType<T> type, Configuration context, C resolutionContext) {
-        HierarchicalConfiguration hConfig = ConfigurationUtils.convertToHierarchical(context);
         GenericType<?> memberType = type.getParameters().get(0);
         FieldResolutionStrategy frs = determiner.determineStrategy(memberType);
-        return type.cast(new ConfigBackedList(name, memberType, hConfig, frs, resolutionContext));
+        return type.cast(new ConfigBackedList(new CollectionHelper(name, memberType, context, frs, resolutionContext)));
     }
 
     @Override
@@ -36,28 +33,21 @@ class ListResolutionStrategy implements FieldResolutionStrategy, FieldResolution
     }
 
     static class ConfigBackedList<T> extends AbstractList<T> {
-        private final String name;
-        private final GenericType<T> memberType;
-        private final HierarchicalConfiguration backingConfiguration;
-        private final FieldResolutionStrategy frs;
-        private final Object resolutionContext;
+        private final CollectionHelper<T> collectionHelper;
 
-        ConfigBackedList(String name, GenericType<T> memberType, HierarchicalConfiguration backingConfiguration, FieldResolutionStrategy frs, Object resolutionContext) {
-            this.name = name;
-            this.memberType = memberType;
-            this.backingConfiguration = backingConfiguration;
-            this.frs = frs;
-            this.resolutionContext = resolutionContext;
+        ConfigBackedList(CollectionHelper<T> collectionHelper) {
+            this.collectionHelper = collectionHelper;
         }
 
         @Override
         public T get(int index) {
-            return frs.resolve(name + "(" + index + ")", memberType, backingConfiguration, resolutionContext);
+            return this.collectionHelper.resolve(index);
         }
 
         @Override
         public int size() {
-            return backingConfiguration.getMaxIndex(name) + 1;
+            return this.collectionHelper.size();
         }
     }
+
 }

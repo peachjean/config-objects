@@ -14,6 +14,8 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 import static org.junit.Assert.*;
@@ -144,12 +146,21 @@ public class DefaultConfigObjectFactoryTest {
         config.setProperty("allStrings(0)", "first");
         config.setProperty("allStrings(1)", "second");
         config.setProperty("allStrings(2)", "third");
+        config.addProperty("stringSet", "alpha");
+        config.addProperty("stringSet", "bravo");
+        config.addProperty("stringSet", "charlie");
 
         ConfigObjectFactory factory = new DefaultConfigObjectFactory();
         GenericConfigObject obj = factory.create(config, GenericConfigObject.class);
 
         assertEquals("late late show", obj.getString());
         assertEquals(Arrays.asList("first", "second", "third"), obj.getAllStrings());
+        assertEquals(new HashSet<String>(Arrays.asList("alpha", "bravo", "charlie")), obj.getStringSet());
+
+        config.clearProperty("allStrings(2)");
+        config.setProperty("stringSet", "omega");
+        assertEquals(Arrays.asList("first", "second"), obj.getAllStrings());
+        assertEquals(Collections.singleton("omega"), obj.getStringSet());
     }
 
     @Test
