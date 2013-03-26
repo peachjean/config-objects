@@ -12,8 +12,7 @@ import org.junit.Test;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
@@ -198,6 +197,8 @@ public abstract class AbstractImplementationGeneratorTest {
         EasyMock.expectLastCall().anyTimes();
         expect(mockBacker.lookup("string", GenericType.forType(String.class))).andReturn("late late show").anyTimes();
         expect(mockBacker.lookup("allStrings", GenericType.forTypeWithParams(List.class, GenericType.forTypeWithParams(String.class)))).andReturn(Arrays.asList("first", "second", "third")).anyTimes();
+        expect(mockBacker.lookup("numberMap", GenericType.forTypeWithParams(Map.class, GenericType.forTypeWithParams(String.class), GenericType.forTypeWithParams(Integer.class)))).andReturn(Collections.emptyMap()).anyTimes();
+        expect(mockBacker.lookup("stringSet", GenericType.forTypeWithParams(Set.class, GenericType.forTypeWithParams(String.class)))).andReturn(Collections.emptySet()).anyTimes();
 
         EasyMock.replay(mockBacker);
 
