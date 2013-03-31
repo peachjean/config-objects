@@ -27,4 +27,9 @@ public class BaseConfigObjectVisitor<T, I> implements ConfigObjectVisitor<T, I> 
     public void visitDefaults(Class<? extends T> defaultsClass, I input) {
         // do nothing
     }
+
+    @Override
+    public void visitNamedImplementation(Class<? extends T> implementationClass, String name, I input) {
+        // do nothing
+    }
 }

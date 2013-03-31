@@ -1,5 +1,6 @@
 package net.peachjean.confobj.support;
 
+import net.peachjean.confobj.introspection.BaseConfigObjectVisitor;
 import net.peachjean.confobj.introspection.ConfigObjectIntrospector;
 import net.peachjean.confobj.introspection.ConfigObjectVisitor;
 import net.peachjean.confobj.introspection.GenericType;
@@ -620,7 +621,7 @@ class AsmImplementationGenerator implements ImplementationGenerator {
         }
     }
 
-    private class AsmVisitor<T> implements ConfigObjectVisitor<T,ConfObjModel<T>> {//
+    private class AsmVisitor<T> extends BaseConfigObjectVisitor<T,ConfObjModel<T>> {//
 //        @Override
         public <P> void visitSimple(String name, Method method, GenericType<P> propertyType, boolean required, ConfObjModel<T> input) {
             input.fields.add(new FieldModel(method.getName(), propertyType, name, required));
