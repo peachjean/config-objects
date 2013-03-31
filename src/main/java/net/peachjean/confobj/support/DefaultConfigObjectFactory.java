@@ -1,13 +1,12 @@
 package net.peachjean.confobj.support;
 
+import net.peachjean.confobj.introspection.BaseConfigObjectVisitor;
+import net.peachjean.confobj.introspection.ConfigObjectIntrospector;
 import net.peachjean.confobj.introspection.GenericType;
 import org.apache.commons.collections.list.UnmodifiableList;
 import org.apache.commons.configuration.Configuration;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  *
@@ -48,6 +47,13 @@ public class DefaultConfigObjectFactory implements ConfigObjectFactory {
         @Override
         public Instantiator<?> load(Class<?> key) {
             return DefaultConfigObjectFactory.this.createNewInstantiator(key);
+        }
+    });
+
+    private final SimpleCache<Class<?>, Map<String, Class<?>>> implementationCache = SimpleCache.build(new SimpleCache.Loader<Class<?>, Map<String, Class<?>>>() {
+        @Override
+        public Map<String, Class<?>> load(Class<?> key) {
+            return (Map<String, Class<?>>) DefaultConfigObjectFactory.this.createNewImplementationMap(key);
         }
     });
 
@@ -96,6 +102,30 @@ public class DefaultConfigObjectFactory implements ConfigObjectFactory {
     }
 
     @Override
+    public <T> T createNamedImpl(Configuration config, Class<T> confObjType, String name) {
+        return this.create(config, lookupNamedImpl(confObjType, name));
+    }
+
+    @Override
+    public <T> T createNamedImpl(Configuration config, Class<T> confObjType, String name, InstantiationContext context) {
+        return this.create(config, lookupNamedImpl(confObjType, name), context);
+    }
+
+    @Override
+    public <T> T createNamedImpl(Configuration config, Class<T> confObjType, String name, Object context) {
+        return this.create(config, lookupNamedImpl(confObjType, name), context);
+    }
+
+    private <T> Class<? extends T> lookupNamedImpl(Class<T> confObjType, String name) {
+        Map<String, Class<?>> implMap = this.implementationCache.get(confObjType);
+        if(implMap.containsKey(name)) {
+            return (Class<? extends T>) implMap.get(name);
+        } else {
+            throw new UnrecognizedImplementationNameException(name, confObjType);
+        }
+    }
+
+    @Override
     public <T> Instantiator<T> createGenerator(final Class<T> confObjType) {
         return (Instantiator<T>) instantiatorCache.get(confObjType);
     }
@@ -129,4 +159,14 @@ public class DefaultConfigObjectFactory implements ConfigObjectFactory {
         };
     }
 
+    private <T> Map<String, Class<? extends T>> createNewImplementationMap(Class<T> key) {
+        Map<String, Class<? extends T>> implementationMap = new HashMap<String, Class<? extends T>>();
+        ConfigObjectIntrospector.visitMembers(key, implementationMap, new BaseConfigObjectVisitor<T, Map<String, Class<? extends T>>>() {
+            @Override
+            public void visitNamedImplementation(Class<? extends T> implementationClass, String name, Map<String, Class<? extends T>> input) {
+                input.put(name, implementationClass);
+            }
+        });
+        return implementationMap;
+    }
 }

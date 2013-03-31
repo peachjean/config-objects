@@ -1,9 +1,6 @@
 package net.peachjean.confobj.support;
 
-import net.peachjean.confobj.support.example.CompoundConfigObject;
-import net.peachjean.confobj.support.example.ExampleConfigObject;
-import net.peachjean.confobj.support.example.GenericCompound;
-import net.peachjean.confobj.support.example.GenericConfigObject;
+import net.peachjean.confobj.support.example.*;
 import net.peachjean.confobj.support.example.shared.MasterConfigObject;
 import org.apache.bval.jsr303.ApacheValidationProvider;
 import org.apache.commons.configuration.BaseConfiguration;
@@ -184,5 +181,34 @@ public class DefaultConfigObjectFactoryTest {
 
         assertEquals("first,second,third", obj.getChild().getCombinedRoles());
         assertEquals(10, obj.getChild().getMaxLimit().intValue());
+    }
+
+    @Test
+    public void pluginExample() {
+        Configuration configuration = new BaseConfiguration();
+        configuration.setProperty("count", "5");
+        configuration.setProperty("late", "true");
+        configuration.setProperty("early", "false");
+        configuration.setProperty("maxInstances", "10");
+        configuration.setProperty("minInstances", "2");
+
+        ConfigObjectFactory factory = new DefaultConfigObjectFactory();
+        PluginParentCO obj = factory.createNamedImpl(configuration, PluginParentCO.class, "one");
+
+        assertTrue("is implementation type", obj instanceof PluginOneCO);
+
+        PluginOneCO one = (PluginOneCO) obj;
+        assertEquals(5, one.getCount().intValue());
+        assertEquals(10, one.getMaxInstances().intValue());
+        assertEquals(true, one.isLate());
+
+        PluginParentCO obj2 = factory.createNamedImpl(configuration, PluginParentCO.class, "two");
+
+        assertTrue("is implementation type", obj2 instanceof PluginTwoCO);
+
+        PluginTwoCO two = (PluginTwoCO) obj2;
+        assertEquals(5, two.getCount().intValue());
+        assertEquals(2, two.getMinInstances().intValue());
+        assertEquals(false, two.isEarly());
     }
 }

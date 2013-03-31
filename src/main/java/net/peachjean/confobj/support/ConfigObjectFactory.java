@@ -9,9 +9,11 @@ public interface ConfigObjectFactory {
 
     <T> T create(Configuration config, Class<T> confObjType, Object context);
 
-//    <T> T createNamedImpl(Configuration config, Class<T> confObjType, String name, InstantiationContext context);
-//
-//    <T> T createNamedImpl(Configuration config, Class<T> confObjType, String name, Object context);
+    <T> T createNamedImpl(Configuration config, Class<T> confObjType, String name);
+
+    <T> T createNamedImpl(Configuration config, Class<T> confObjType, String name, InstantiationContext context);
+
+    <T> T createNamedImpl(Configuration config, Class<T> confObjType, String name, Object context);
 
     <T> Instantiator<T> createGenerator(Class<T> confObjType);
 }
