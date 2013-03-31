@@ -14,7 +14,7 @@ import java.util.List;
 class CollectionHelper<T> {
     private final String name;
     private final GenericType<T> memberType;
-    private HierarchicalConfiguration backingConfiguration;
+    private HierarchicalConfiguration backingConfiguration = new HierarchicalConfiguration();
     private final FieldResolutionStrategy frs;
     private final Object resolutionContext;
     private final List<FieldResolution<T>> resolutionBacking = new ArrayList<FieldResolution<T>>();
@@ -22,14 +22,15 @@ class CollectionHelper<T> {
     CollectionHelper(String name, GenericType<T> memberType, final Configuration backingConfiguration, FieldResolutionStrategy frs, Object resolutionContext) {
         this.name = name;
         this.memberType = memberType;
-        this.backingConfiguration = ConfigurationUtils.convertToHierarchical(backingConfiguration);
-        if(!(backingConfiguration instanceof HierarchicalConfiguration) && backingConfiguration instanceof EventSource) {
+        HierarchicalConfiguration convertedConfiguration = ConfigurationUtils.convertToHierarchical(backingConfiguration);
+        this.backingConfiguration.setRootNode(convertedConfiguration.getRootNode());
+        if(convertedConfiguration != backingConfiguration && backingConfiguration instanceof EventSource) {
             ((EventSource)backingConfiguration).addConfigurationListener(new ConfigurationListener() {
                 @Override
                 public void configurationChanged(ConfigurationEvent event) {
                     if(!event.isBeforeUpdate()) {
                         HierarchicalConfiguration hc = ConfigurationUtils.convertToHierarchical(backingConfiguration);
-                        CollectionHelper.this.backingConfiguration = hc;
+                        CollectionHelper.this.backingConfiguration.setRootNode(hc.getRootNode());
                     }
                 }
             });
