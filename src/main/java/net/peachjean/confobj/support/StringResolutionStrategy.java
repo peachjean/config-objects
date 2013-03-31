@@ -28,9 +28,4 @@ class StringResolutionStrategy implements FieldResolutionStrategy {
     public boolean supports(final GenericType<?> lookupType) {
         return String.class.equals(lookupType.getRawType());
     }
-
-    @Override
-    public boolean isContextBacked() {
-        return false;
-    }
 }

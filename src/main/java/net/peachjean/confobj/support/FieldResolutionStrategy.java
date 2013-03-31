@@ -15,19 +15,6 @@ public interface FieldResolutionStrategy {
     boolean supports(GenericType<?> lookupType);
 
     /**
-     * If this method returns {@code true} then any object returned by {@link #resolve} will change dynamically as the
-     * backing configuration changes.
-     *
-     * This means that when a resolution strategy is context-backed, any clients should retain references returned by
-     * {@link #resolve}, rather than re-invoking it every time.
-     * @return
-     * @deprecated This should not be used anymore.  Simply store the {@link FieldResolution} returned from the
-     * {@link #resolve} method and let the strategy care about if the resulting object is context-backed or not.
-     */
-    @Deprecated
-    boolean isContextBacked();
-
-    /**
      * This is used by strategies for "container" objects - that delegate to other strategies.
      */
     static interface Determiner {

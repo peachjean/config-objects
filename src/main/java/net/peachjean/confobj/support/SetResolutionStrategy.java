@@ -27,11 +27,6 @@ class SetResolutionStrategy implements FieldResolutionStrategy, FieldResolutionS
     }
 
     @Override
-    public boolean isContextBacked() {
-        return true;
-    }
-
-    @Override
     public void setDeterminer(Determiner determiner) {
         this.determiner = determiner;
     }

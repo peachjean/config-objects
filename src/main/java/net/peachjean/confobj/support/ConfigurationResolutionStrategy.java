@@ -19,9 +19,4 @@ class ConfigurationResolutionStrategy implements FieldResolutionStrategy {
     public boolean supports(GenericType<?> lookupType) {
         return lookupType.equals(Configuration.class);
     }
-
-    @Override
-    public boolean isContextBacked() {
-        return true;
-    }
 }

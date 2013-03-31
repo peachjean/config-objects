@@ -57,9 +57,4 @@ class ValueOfResolutionStrategy implements FieldResolutionStrategy {
     public boolean supports(final GenericType<?> lookupType) {
         return lookupMethod(lookupType.getRawType()) != null;
     }
-
-    @Override
-    public boolean isContextBacked() {
-        return false;
-    }
 }

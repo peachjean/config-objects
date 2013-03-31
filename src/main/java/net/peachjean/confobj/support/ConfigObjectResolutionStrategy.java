@@ -27,9 +27,4 @@ class ConfigObjectResolutionStrategy implements FieldResolutionStrategy {
     public boolean supports(final GenericType<?> lookupType) {
         return lookupType.getRawType().isAnnotationPresent(ConfigObject.class);
     }
-
-    @Override
-    public boolean isContextBacked() {
-        return true;
-    }
 }

@@ -10,7 +10,7 @@ class ConfigurationConfigObjectBacker<I> implements ConfigObjectBacker<I> {
 
     // contains values that handle reloading on their own - these are often more expensive to create so we
     // don't want to recreate them on every get call
-    private final Map<String, Object> cachedValues;
+    private final Map<String, FieldResolution<?>> cachedValues;
     private final Configuration context;
     private final FieldResolutionStrategy.Determiner strategyDeterminer;
     private I containing;
@@ -18,7 +18,7 @@ class ConfigurationConfigObjectBacker<I> implements ConfigObjectBacker<I> {
     public ConfigurationConfigObjectBacker(Configuration context, FieldResolutionStrategy.Determiner strategyDeterminer) {
         this.context = context;
         this.strategyDeterminer = strategyDeterminer;
-        cachedValues = new HashMap<String, Object>();
+        cachedValues = new HashMap<String, FieldResolution<?>>();
     }
 
     @Override
@@ -28,28 +28,22 @@ class ConfigurationConfigObjectBacker<I> implements ConfigObjectBacker<I> {
 
     @Override
     public <T> T lookup(final String name, final GenericType<T> lookupType) {
-        this.validateState();
-        FieldResolutionStrategy resolutionStrategy = this.determineStrategy(lookupType);
-        if (resolutionStrategy.isContextBacked()) {
-            if (cachedValues.containsKey(name)) {
-                return lookupType.cast(cachedValues.get(name));
-            }
-        }
-        final T resolved = resolutionStrategy.resolve(name, lookupType, context, containing).resolve();
-        if (resolved == null) {
-            throw new IllegalStateException("No value for " + name);
-        }
-        if (resolutionStrategy.isContextBacked()) {
-            cachedValues.put(name, resolved);
-        }
-        return resolved;
+        return this.locateResolution(name, lookupType).resolve();
     }
 
     @Override
     public <T> T lookup(final String name, final GenericType<T> lookupType, final T defaultValue) {
+        return this.locateResolution(name, lookupType).resolve(defaultValue);
+    }
+
+    private <T> FieldResolution<T> locateResolution(final String name, final GenericType<T> lookupType) {
         this.validateState();
-        FieldResolutionStrategy resolutionStrategy = this.determineStrategy(lookupType);
-        return resolutionStrategy.resolve(name, lookupType, context, containing).resolve(defaultValue);
+        if(!this.cachedValues.containsKey(name)) {
+            FieldResolutionStrategy resolutionStrategy = this.determineStrategy(lookupType);
+            FieldResolution<T> resolution = resolutionStrategy.resolve(name, lookupType, context, containing);
+            this.cachedValues.put(name, resolution);
+        }
+        return (FieldResolution<T>) this.cachedValues.get(name);
     }
 
     private void validateState() {

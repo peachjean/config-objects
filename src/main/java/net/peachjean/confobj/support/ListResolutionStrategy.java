@@ -25,11 +25,6 @@ class ListResolutionStrategy implements FieldResolutionStrategy, FieldResolution
     }
 
     @Override
-    public boolean isContextBacked() {
-        return true;
-    }
-
-    @Override
     public void setDeterminer(Determiner determiner) {
         this.determiner = determiner;
     }
