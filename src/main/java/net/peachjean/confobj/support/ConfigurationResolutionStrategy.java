@@ -7,11 +7,12 @@ class ConfigurationResolutionStrategy implements FieldResolutionStrategy {
     public static final ConfigurationResolutionStrategy INSTANCE = new ConfigurationResolutionStrategy();
 
     @Override
-    public <T, C> T resolve(String name, GenericType<T> lookupType, Configuration context, C resolutionContext) {
+    public <T, C> FieldResolution<T> resolve(String name, GenericType<T> lookupType, Configuration context, C resolutionContext) {
         if(!this.supports(lookupType)) {
             throw new IllegalArgumentException("I only support Configuration resolution.");
         }
-        return (T) context.subset(name);
+        T resolved = lookupType.cast(context.subset(name));
+        return new FieldResolution.Resolved<T>(ConfigurationUtils.determineFullPath(context, name), resolved);
     }
 
     @Override

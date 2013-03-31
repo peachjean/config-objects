@@ -8,15 +8,20 @@ class StringResolutionStrategy implements FieldResolutionStrategy {
     public static final StringResolutionStrategy INSTANCE = new StringResolutionStrategy();
 
     @Override
-    public <T, C> T resolve(final String name, final GenericType<T> lookupType, final Configuration config, final C resolutionContext) {
+    public <T, C> FieldResolution<T> resolve(final String name, final GenericType<T> lookupType, final Configuration config, final C resolutionContext) {
         if (!this.supports(lookupType)) {
             throw new IllegalArgumentException("This strategy only supports Strings.");
         }
-        if(!config.containsKey(name)) {
-            return null;
-        } else {
-            return lookupType.cast(config.getString(name));
-        }
+        return new FieldResolution.Simple<T>(ConfigurationUtils.determineFullPath(config, name)) {
+            @Override
+            protected T doResolve() {
+                if(!config.containsKey(name)) {
+                    return null;
+                } else {
+                    return lookupType.cast(config.getString(name));
+                }
+            }
+        };
     }
 
     @Override

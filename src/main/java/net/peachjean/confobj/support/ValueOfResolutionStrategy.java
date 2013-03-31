@@ -12,22 +12,26 @@ class ValueOfResolutionStrategy implements FieldResolutionStrategy {
     public static final ValueOfResolutionStrategy INSTANCE = new ValueOfResolutionStrategy();
 
     @Override
-    public <T, C> T resolve(final String name, final GenericType<T> lookupType, final Configuration config, final C resolutionContext) {
-
-        if (config.containsKey(name)) {
-            return getAndReturn(name, lookupType, config);
-        } else {
-            return null;
+    public <T, C> FieldResolution<T> resolve(final String name, final GenericType<T> lookupType, final Configuration config, final C resolutionContext) {
+        final Method m = lookupMethod(lookupType.getRawType());
+        if(m == null) {
+            throw new IllegalArgumentException("Class " + lookupType.getRawType().getName() + " does not have a valueOf method.");
         }
+        return new FieldResolution.Simple<T>(ConfigurationUtils.determineFullPath(config, name)) {
+            @Override
+            protected T doResolve() {
+                if(config.containsKey(name)) {
+                    return getAndReturn(name, lookupType, config, m);
+                } else {
+                    return null;
+                }
+            }
+        };
     }
 
-    private <T, C> T getAndReturn(final String name, final GenericType<T> lookupType, Configuration config) {
+    private <T, C> T getAndReturn(final String name, final GenericType<T> lookupType, Configuration config, Method m) {
         String value = config.getString(name);
         try {
-            Method m = lookupMethod(lookupType.getRawType());
-            if (m == null) {
-                throw new IllegalArgumentException("Class " + lookupType.getRawType().getName() + " does not have a valueOf method.");
-            }
             return lookupType.cast(m.invoke(null, value));
         } catch (InvocationTargetException e) {
             throw new IllegalStateException("Could not invoke valueOf method on " + lookupType, e);

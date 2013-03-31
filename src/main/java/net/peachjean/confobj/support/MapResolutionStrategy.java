@@ -9,10 +9,11 @@ class MapResolutionStrategy implements FieldResolutionStrategy, FieldResolutionS
     private Determiner determiner;
 
     @Override
-    public <T, C> T resolve(String name, GenericType<T> type, Configuration context, C resolutionContext) {
+    public <T, C> FieldResolution<T> resolve(String name, GenericType<T> type, Configuration context, C resolutionContext) {
         GenericType<?> valueType = type.getParameters().get(1);
 
-        return type.cast(new ConfigBackedMap(context.subset(name), valueType, determiner.determineStrategy(valueType), resolutionContext));
+        T resolved = type.cast(new ConfigBackedMap(context.subset(name), valueType, determiner.determineStrategy(valueType), resolutionContext));
+        return new FieldResolution.Resolved<T>(ConfigurationUtils.determineFullPath(context, name), resolved);
     }
 
     @Override
@@ -37,12 +38,19 @@ class MapResolutionStrategy implements FieldResolutionStrategy, FieldResolutionS
         private final GenericType<V> valueType;
         private final FieldResolutionStrategy valueFrs;
         private final Object resolutionContext;
+        private final SimpleCache<String, FieldResolution<V>> resolutionCache;
 
-        private ConfigBackedMap(Configuration configuration, GenericType<V> valueType, FieldResolutionStrategy valueFrs, Object resolutionContext) {
+        private ConfigBackedMap(final Configuration configuration, final GenericType<V> valueType, final FieldResolutionStrategy valueFrs, final Object resolutionContext) {
             this.configuration = configuration;
             this.valueType = valueType;
             this.valueFrs = valueFrs;
             this.resolutionContext = resolutionContext;
+            resolutionCache = new SimpleCache<String, FieldResolution<V>>(new SimpleCache.Loader<String, FieldResolution<V>>() {
+                @Override
+                public FieldResolution<V> load(String key) {
+                    return valueFrs.resolve(key, valueType, configuration, resolutionContext);
+                }
+            });
         }
 
         @Override
@@ -51,7 +59,7 @@ class MapResolutionStrategy implements FieldResolutionStrategy, FieldResolutionS
             Iterator<String> keys = configuration.getKeys();
             while(keys.hasNext()) {
                 String key = keys.next();
-                set.add(new SimpleEntry<String, V>(key, valueFrs.resolve(key, valueType, configuration, resolutionContext)));
+                set.add(new SimpleEntry<String, V>(key, resolutionCache.get(key).resolve()));
             }
             return set;
         }

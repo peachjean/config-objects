@@ -11,10 +11,11 @@ class ListResolutionStrategy implements FieldResolutionStrategy, FieldResolution
     private Determiner determiner;
 
     @Override
-    public <T, C> T resolve(String name, GenericType<T> type, Configuration context, C resolutionContext) {
+    public <T, C> FieldResolution<T> resolve(String name, GenericType<T> type, Configuration context, C resolutionContext) {
         GenericType<?> memberType = type.getParameters().get(0);
         FieldResolutionStrategy frs = determiner.determineStrategy(memberType);
-        return type.cast(new ConfigBackedList(new CollectionHelper(name, memberType, context, frs, resolutionContext)));
+        T resolved = type.cast(new ConfigBackedList(new CollectionHelper(name, memberType, context, frs, resolutionContext)));
+        return new FieldResolution.Resolved<T>(ConfigurationUtils.determineFullPath(context, name), resolved);
     }
 
     @Override

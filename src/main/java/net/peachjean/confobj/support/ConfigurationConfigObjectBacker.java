@@ -35,7 +35,7 @@ class ConfigurationConfigObjectBacker<I> implements ConfigObjectBacker<I> {
                 return lookupType.cast(cachedValues.get(name));
             }
         }
-        final T resolved = resolutionStrategy.resolve(name, lookupType, context, containing);
+        final T resolved = resolutionStrategy.resolve(name, lookupType, context, containing).resolve();
         if (resolved == null) {
             throw new IllegalStateException("No value for " + name);
         }
@@ -49,8 +49,7 @@ class ConfigurationConfigObjectBacker<I> implements ConfigObjectBacker<I> {
     public <T> T lookup(final String name, final GenericType<T> lookupType, final T defaultValue) {
         this.validateState();
         FieldResolutionStrategy resolutionStrategy = this.determineStrategy(lookupType);
-        final T resolved = resolutionStrategy.resolve(name, lookupType, context, containing);
-        return resolved != null ? resolved : defaultValue;
+        return resolutionStrategy.resolve(name, lookupType, context, containing).resolve(defaultValue);
     }
 
     private void validateState() {

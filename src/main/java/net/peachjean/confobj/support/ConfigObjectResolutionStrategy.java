@@ -12,14 +12,15 @@ class ConfigObjectResolutionStrategy implements FieldResolutionStrategy {
     }
 
     @Override
-    public <T, C> T resolve(String name, GenericType<T> lookupType, Configuration configuration, C resolutionContext) {
+    public <T, C> FieldResolution<T> resolve(String name, GenericType<T> lookupType, Configuration configuration, C resolutionContext) {
         if (!this.supports(lookupType)) {
             throw new IllegalArgumentException("This strategy only supports configuration object types, not " + lookupType.getRawType().getName());
         }
 
         @SuppressWarnings("unchecked")
         Configuration subContext = configuration.subset (name);
-        return configObjectFactory.create(subContext, lookupType.getRawType(), resolutionContext);
+        T resolved = configObjectFactory.create(subContext, lookupType.getRawType(), resolutionContext);
+        return new FieldResolution.Resolved<T>(ConfigurationUtils.determineFullPath(configuration, name), resolved);
     }
 
     @Override

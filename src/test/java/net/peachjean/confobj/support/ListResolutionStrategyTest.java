@@ -42,7 +42,8 @@ public class ListResolutionStrategyTest {
             }
         });
 
-        List<String> myList = lrs.<List<String>, Object>resolve("myList", GenericType.<List<String>, List>forTypeWithParams(List.class, GenericType.forTypeWithParams(String.class)), config, null);
+        FieldResolution<List<String>> resolution = lrs.resolve("myList", GenericType.<List<String>, List>forTypeWithParams(List.class, GenericType.forTypeWithParams(String.class)), config, null);
+        List<String> myList = resolution.resolve();
 
         assertEquals(Arrays.asList("val1", "val2", "val3"), myList);
     }
@@ -73,7 +74,8 @@ public class ListResolutionStrategyTest {
             }
         });
 
-        List<String> myList = lrs.<List<String>, Object>resolve("myList", GenericType.<List<String>, List>forTypeWithParams(List.class, GenericType.forTypeWithParams(String.class)), config, null);
+        FieldResolution<List<String>> resolution = lrs.resolve("myList", GenericType.<List<String>, List>forTypeWithParams(List.class, GenericType.forTypeWithParams(String.class)), config, null);
+        List<String> myList = resolution.resolve();
 
         assertEquals(Arrays.asList("val1", "val2", "val3"), myList);
     }
