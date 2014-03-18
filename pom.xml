@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.sonatype.oss</groupId>
         <artifactId>oss-parent</artifactId>
-        <version>7</version>
+        <version>9</version>
     </parent>
 
     <groupId>net.peachjean.confobj</groupId>
@@ -86,9 +86,9 @@
             <version>1.2</version>
         </dependency>
         <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-            <version>4.0-20130322.182931-187</version>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+            <version>4.0</version>
         </dependency>
         <dependency>
             <groupId>javax.inject</groupId>
@@ -159,6 +159,11 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6</version>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>2.0</version>
@@ -173,17 +178,12 @@
                             <dependencyReducedPomLocation>${project.build.directory}/dependency-reduced-pom.xml</dependencyReducedPomLocation>
                             <relocations>
                                 <relocation>
-                                    <pattern>org.apache.commons.collections</pattern>
-                                    <shadedPattern>net.peachjean.confobj._repkg.org.apache.commons.collections</shadedPattern>
-                                </relocation>
-                                <relocation>
                                     <pattern>org.objectweb.asm</pattern>
                                     <shadedPattern>net.peachjean.confobj._repkg.org.objectweb.asm</shadedPattern>
                                 </relocation>
                             </relocations>
                             <artifactSet>
                                 <includes>
-                                    <include>commons-collections:commons-collections</include>
                                     <include>org.ow2.asm:asm</include>
                                 </includes>
                             </artifactSet>
