@@ -3,7 +3,7 @@ package net.peachjean.confobj.support;
 import net.peachjean.confobj.introspection.BaseConfigObjectVisitor;
 import net.peachjean.confobj.introspection.ConfigObjectIntrospector;
 import net.peachjean.confobj.introspection.GenericType;
-import org.apache.commons.collections.list.UnmodifiableList;
+import org.apache.commons.collections4.list.UnmodifiableList;
 import org.apache.commons.configuration.Configuration;
 
 import java.util.*;
@@ -53,7 +53,7 @@ public class DefaultConfigObjectFactory implements ConfigObjectFactory {
     private final SimpleCache<Class<?>, Map<String, Class<?>>> implementationCache = SimpleCache.build(new SimpleCache.Loader<Class<?>, Map<String, Class<?>>>() {
         @Override
         public Map<String, Class<?>> load(Class<?> key) {
-            return (Map<String, Class<?>>) DefaultConfigObjectFactory.this.createNewImplementationMap(key);
+            return (Map<String, Class<?>>)DefaultConfigObjectFactory.this.createNewImplementationMap(key);
         }
     });
 
@@ -66,7 +66,7 @@ public class DefaultConfigObjectFactory implements ConfigObjectFactory {
     }
 
     public DefaultConfigObjectFactory(Iterable<FieldResolutionStrategy> strategies) {
-        List<FieldResolutionStrategy> strategyList = new ArrayList();
+        List<FieldResolutionStrategy> strategyList = new ArrayList<FieldResolutionStrategy>();
         strategyList.add(StringResolutionStrategy.INSTANCE);
         strategyList.add(ValueOfResolutionStrategy.INSTANCE);
         strategyList.add(new ConfigObjectResolutionStrategy(this));
@@ -153,17 +153,17 @@ public class DefaultConfigObjectFactory implements ConfigObjectFactory {
                 return this.instantiate(configuration, new ObjectContext(context));
             }
 
-            private <T> ConfigObjectBacker createBacker(final Configuration context) {
+            private ConfigObjectBacker createBacker(final Configuration context) {
                 return new ConfigurationConfigObjectBacker(context, strategyDeterminer);
             }
         };
     }
 
-    private <T> Map<String, Class<? extends T>> createNewImplementationMap(Class<T> key) {
-        Map<String, Class<? extends T>> implementationMap = new HashMap<String, Class<? extends T>>();
-        ConfigObjectIntrospector.visitMembers(key, implementationMap, new BaseConfigObjectVisitor<T, Map<String, Class<? extends T>>>() {
+    private <T> Map<String, Class<?>> createNewImplementationMap(Class<T> key) {
+        Map<String, Class<?>> implementationMap = new HashMap<String, Class<?>>();
+        ConfigObjectIntrospector.visitMembers(key, implementationMap, new BaseConfigObjectVisitor<T, Map<String, Class<?>>>() {
             @Override
-            public void visitNamedImplementation(Class<? extends T> implementationClass, String name, Map<String, Class<? extends T>> input) {
+            public void visitNamedImplementation(Class<? extends T> implementationClass, String name, Map<String, Class<?>> input) {
                 input.put(name, implementationClass);
             }
         });
