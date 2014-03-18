@@ -131,3 +131,12 @@ Non-Obvious Needs / Future Work
    changes, these objects will need to be modified
 7. Should support JSR-303 annotations on getters.
 8. Annotation processor for compile-time validation of `@ConfigObject`-annotated interfaces.
+
+Release Instructions
+--------------------
+
+```
+mvn release:prepare
+mvn release:perform
+```
+

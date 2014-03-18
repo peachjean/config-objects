@@ -163,6 +163,10 @@
                 <artifactId>nexus-staging-maven-plugin</artifactId>
                 <version>1.6</version>
                 <extensions>true</extensions>
+                <configuration>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                    <skipLocalStaging>true</skipLocalStaging>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
