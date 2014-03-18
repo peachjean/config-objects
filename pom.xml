@@ -9,7 +9,7 @@
 
     <groupId>net.peachjean.confobj</groupId>
     <artifactId>config-objects</artifactId>
-    <version>0.2.0</version>
+    <version>0.3.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Config Objects</name>
     <description>
@@ -28,7 +28,7 @@
         <url>https://bitbucket.org/peachjean/config-objects</url>
         <connection>scm:hg:ssh://hg@bitbucket.org/peachjean/config-objects</connection>
         <developerConnection>scm:hg:ssh://hg@bitbucket.org/peachjean/config-objects</developerConnection>
-      <tag>0.2.0</tag>
+      <tag>HEAD</tag>
   </scm>
     <developers>
         <developer>
