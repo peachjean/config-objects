@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/peachjean/config-objects.png?branch=master)](https://travis-ci.org/peachjean/config-objects)
 Config Objects
 ==============
 
