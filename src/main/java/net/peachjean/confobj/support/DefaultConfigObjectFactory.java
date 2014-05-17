@@ -68,6 +68,7 @@ public class DefaultConfigObjectFactory implements ConfigObjectFactory {
     public DefaultConfigObjectFactory(Iterable<FieldResolutionStrategy> strategies) {
         List<FieldResolutionStrategy> strategyList = new ArrayList<FieldResolutionStrategy>();
         strategyList.add(StringResolutionStrategy.INSTANCE);
+        strategyList.add(JodaConvertResolutionStrategy.INSTANCE);
         strategyList.add(ValueOfResolutionStrategy.INSTANCE);
         strategyList.add(new ConfigObjectResolutionStrategy(this));
         strategyList.add(ConfigurationResolutionStrategy.INSTANCE);
