@@ -25,11 +25,10 @@
         </license>
     </licenses>
     <scm>
-        <url>https://bitbucket.org/peachjean/config-objects</url>
-        <connection>scm:hg:ssh://hg@bitbucket.org/peachjean/config-objects</connection>
-        <developerConnection>scm:hg:ssh://hg@bitbucket.org/peachjean/config-objects</developerConnection>
-      <tag>HEAD</tag>
-  </scm>
+        <url>https://github.com/peachjean/config-objects</url>
+        <connection>scm:git:git://github.com/peachjean/config-objects.git</connection>
+        <developerConnection>scm:git:git@github.com:peachjean/config-objects.git</developerConnection>
+    </scm>
     <developers>
         <developer>
             <name>Jared Bunting</name>
