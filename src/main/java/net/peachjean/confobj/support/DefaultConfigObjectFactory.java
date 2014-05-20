@@ -1,12 +1,18 @@
 package net.peachjean.confobj.support;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import net.peachjean.confobj.introspection.BaseConfigObjectVisitor;
 import net.peachjean.confobj.introspection.ConfigObjectIntrospector;
 import net.peachjean.confobj.introspection.GenericType;
+
 import org.apache.commons.collections4.list.UnmodifiableList;
 import org.apache.commons.configuration.Configuration;
-
-import java.util.*;
 
 /**
  *
@@ -43,7 +49,53 @@ public class DefaultConfigObjectFactory implements ConfigObjectFactory {
         }
     };
 
-    private final SimpleCache<Class<?>, Instantiator<?>> instantiatorCache = SimpleCache.build(new SimpleCache.Loader<Class<?>, Instantiator<?>>() {
+	private FieldResolutionStrategy wrapToCast(final FieldResolutionStrategy delegateStrategy)
+	{
+		return new FieldResolutionStrategy()
+		{
+			@Override
+			public <T, C> FieldResolution<T> resolve(final String name, final GenericType<T> type, final Configuration context, final C resolutionContext)
+			{
+				final FieldResolution<T> delegate = delegateStrategy.resolve(name, type, context, resolutionContext);
+				return new FieldResolution<T>()
+				{
+					@Override
+					public T resolve() throws MissingConfigurationException
+					{
+						if (context.containsKey(name) && type.getRawType().isInstance(context.getProperty(name)))
+						{
+							return type.getRawType().cast(context.getProperty(name));
+						}
+						else
+						{
+							return delegate.resolve();
+						}
+					}
+
+					@Override
+					public T resolve(final T defaultValue)
+					{
+						if (context.containsKey(name) && type.getRawType().isInstance(context.getProperty(name)))
+						{
+							return type.getRawType().cast(context.getProperty(name));
+						}
+						else
+						{
+							return delegate.resolve(defaultValue);
+						}
+					}
+				};
+			}
+
+			@Override
+			public boolean supports(final GenericType<?> lookupType)
+			{
+				return delegateStrategy.supports(lookupType);
+			}
+		};
+	}
+
+	private final SimpleCache<Class<?>, Instantiator<?>> instantiatorCache = SimpleCache.build(new SimpleCache.Loader<Class<?>, Instantiator<?>>() {
         @Override
         public Instantiator<?> load(Class<?> key) {
             return DefaultConfigObjectFactory.this.createNewInstantiator(key);
@@ -68,8 +120,8 @@ public class DefaultConfigObjectFactory implements ConfigObjectFactory {
     public DefaultConfigObjectFactory(Iterable<FieldResolutionStrategy> strategies) {
         List<FieldResolutionStrategy> strategyList = new ArrayList<FieldResolutionStrategy>();
         strategyList.add(StringResolutionStrategy.INSTANCE);
-        strategyList.add(JodaConvertResolutionStrategy.INSTANCE);
-        strategyList.add(ValueOfResolutionStrategy.INSTANCE);
+        strategyList.add(wrapToCast(ValueOfResolutionStrategy.INSTANCE));
+	    strategyList.add(wrapToCast(JodaConvertResolutionStrategy.INSTANCE));
         strategyList.add(new ConfigObjectResolutionStrategy(this));
         strategyList.add(ConfigurationResolutionStrategy.INSTANCE);
         strategyList.add(new ListResolutionStrategy());
