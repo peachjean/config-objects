@@ -9,7 +9,7 @@
 
     <groupId>net.peachjean.confobj</groupId>
     <artifactId>config-objects</artifactId>
-    <version>0.4.0</version>
+    <version>0.5.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Config Objects</name>
     <description>
@@ -28,7 +28,7 @@
         <url>https://github.com/peachjean/config-objects</url>
         <connection>scm:git:git://github.com/peachjean/config-objects.git</connection>
         <developerConnection>scm:git:git@github.com:peachjean/config-objects.git</developerConnection>
-      <tag>0.4.0</tag>
+      <tag>HEAD</tag>
   </scm>
     <developers>
         <developer>
