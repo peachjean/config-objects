@@ -7,6 +7,9 @@
 target/
 build.number
 
+# gradle
+.gradle
+
 # common junk
 *.log
 *.swp

@@ -1,0 +1,47 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+
+group = 'net.peachjean.confobj'
+version = '0.5.0-SNAPSHOT'
+
+description = """Config Objects"""
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+configurations.all {
+}
+
+repositories {
+        
+     maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+     maven { url "https://repository.apache.org/content/groups/snapshots/" }
+     maven { url "http://repo.maven.apache.org/maven2" }
+}
+dependencies {
+    compile group: 'org.javassist', name: 'javassist', version:'3.16.1-GA'
+    compile group: 'org.ow2.asm', name: 'asm', version:'4.1'
+    compile group: 'org.apache.commons', name: 'commons-lang3', version:'3.1'
+    compile group: 'commons-io', name: 'commons-io', version:'2.4'
+    compile group: 'commons-configuration', name: 'commons-configuration', version:'1.8'
+    compile group: 'commons-beanutils', name: 'commons-beanutils', version:'1.8.3'
+    compile group: 'commons-cli', name: 'commons-cli', version:'1.2'
+    compile group: 'org.apache.commons', name: 'commons-collections4', version:'4.0'
+    compile group: 'javax.inject', name: 'javax.inject', version:'1'
+    compile group: 'javax.validation', name: 'validation-api', version:'1.0.0.GA'
+    compile group: 'org.apache.bval', name: 'bval-jsr303', version:'0.5'
+    compile group: 'org.antlr', name: 'stringtemplate', version:'4.0.2'
+    compile group: 'net.peachjean.tater', name: 'tater-utils', version:'0.2'
+    compile group: 'org.joda', name: 'joda-convert', version:'1.6'
+    compile group: 'org.codehaus.groovy', name: 'groovy-all', version:'2.3.0'
+    testCompile group: 'org.ow2.asm', name: 'asm-util', version:'4.1'
+    testCompile group: 'joda-time', name: 'joda-time', version:'2.3'
+    testCompile group: 'junit', name: 'junit', version:'4.11'
+    testCompile group: 'org.hamcrest', name: 'hamcrest-core', version:'1.3'
+    testCompile group: 'org.hamcrest', name: 'hamcrest-library', version:'1.3'
+    testCompile group: 'org.easymock', name: 'easymock', version:'3.1'
+    testCompile group: 'net.peachjean.tater', name: 'tater-test-harness', version:'0.2'
+    testCompile group: 'org.spockframework', name: 'spock-core', version:'0.7-groovy-2.0'
+    testCompile group: 'com.github.goldin', name: 'spock-extensions', version:'0.1.4'
+    testCompile group: 'nl.jqno.equalsverifier', name: 'equalsverifier', version:'1.4'
+}
