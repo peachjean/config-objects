@@ -9,6 +9,7 @@ build.number
 
 # gradle
 .gradle
+build
 
 # common junk
 *.log
