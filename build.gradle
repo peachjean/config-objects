@@ -45,3 +45,28 @@ dependencies {
     testCompile group: 'com.github.goldin', name: 'spock-extensions', version:'0.1.4'
     testCompile group: 'nl.jqno.equalsverifier', name: 'equalsverifier', version:'1.4'
 }
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:0.8'
+    }
+}
+
+apply plugin: 'shadow'
+
+shadow {
+    artifactSet {
+        include 'org.ow2.asm:asm'
+    }
+    relocation {
+        pattern = 'org.objectweb.asm'
+        shadedPattern = 'net.peachjean.confobj._repkg.asm'
+    }
+}
+
+task jar(overwrite: true) << {
+    shadowJar
+}
