@@ -67,6 +67,6 @@ shadow {
     }
 }
 
-task jar(overwrite: true) << {
-    shadowJar
-}
+build.dependsOn << shadowJar
+install.dependsOn << shadowJar
+
